@@ -1,0 +1,7 @@
+# macOS
+.DS_Store
+
+# Dev / herramientas locales (no se publican)
+.claude/
+.tools/
+zz*.html
