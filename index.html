@@ -173,21 +173,24 @@
   .set-head label { font-size: 13px; opacity: .8; display: flex; align-items: center; gap: 6px; }
   .set-head input[type=number] { width: 72px; }
 
-  .aplicar {
-    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-    background: #0f172a; border: 1px dashed #334155; border-radius: 10px;
-    padding: 8px 10px; margin-bottom: 12px; font-size: 13px;
+  .tiempos {
+    display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+    background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px;
   }
-  .aplicar input[type=number] { width: 64px; }
+  .tiempos label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+  .tiempos label span { opacity: .8; font-weight: 600; }
+  .tiempos input[type=number] { width: 110px; }
 
-  table.slots { width: 100%; border-collapse: collapse; }
-  table.slots th { font-size: 12px; text-transform: uppercase; opacity: .6; text-align: left; padding: 4px 6px; font-weight: 700; }
-  table.slots td { padding: 4px 6px; vertical-align: middle; }
-  table.slots input[type=number] { width: 64px; }
-  table.slots input[type=text] { width: 100%; min-width: 120px; }
-  table.slots .num { text-align: center; opacity: .6; font-weight: 700; width: 28px; }
-  table.slots .acc { white-space: nowrap; }
-  table.slots .acc button { padding: 4px 8px; font-size: 13px; }
+  .ej-cols { display: flex; gap: 14px; }
+  .ej-col { flex: 1; min-width: 0; background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px; }
+  .ej-col-tit { font-size: 13px; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; }
+  .col-martin .ej-col-tit { color: #bae6fd; }
+  .col-daniela .ej-col-tit { color: #fbcfe8; }
+  .ej-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .ej-num { width: 18px; flex: none; text-align: center; opacity: .5; font-weight: 700; font-size: 13px; }
+  .ej-row input[type=text] { flex: 1; min-width: 0; }
+  .ej-row .chico { padding: 6px 8px; font-size: 13px; }
+  .add-ej { margin-top: 4px; }
 
   .catalogo-lista { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
   .cat-row { display: flex; gap: 8px; align-items: center; }
@@ -219,28 +222,16 @@
   }
   body.modo-mobile #controles button { flex: 1; font-size: 22px; padding: 18px 6px; min-width: 0; }
   body.modo-mobile #btn-play { flex: 1.6; }
-  body.modo-mobile table.slots, body.modo-mobile table.slots tbody,
-  body.modo-mobile table.slots tr, body.modo-mobile table.slots td { display: block; }
-  body.modo-mobile table.slots thead { display: none; }
-  body.modo-mobile table.slots tr { border: 1px solid #334155; border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; background: #0f172a; }
-  body.modo-mobile table.slots td { display: flex; align-items: center; gap: 10px; padding: 5px 0; }
-  body.modo-mobile table.slots td::before {
-    content: attr(data-label); flex: none; min-width: 96px;
-    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #94a3b8;
-  }
-  body.modo-mobile table.slots td.num { font-weight: 800; color: #f8fafc; opacity: 1; border-bottom: 1px solid #334155; padding-bottom: 8px; margin-bottom: 6px; font-size: 15px; }
-  body.modo-mobile table.slots td.num::before { min-width: auto; color: #60a5fa; }
-  body.modo-mobile table.slots input[type=number] { width: 110px; }
-  body.modo-mobile table.slots input[type=text] { flex: 1; min-width: 0; }
-  body.modo-mobile table.slots td.acc { justify-content: flex-end; gap: 8px; padding-top: 8px; }
-  body.modo-mobile table.slots td.acc::before { content: none; }
-  body.modo-mobile table.slots td.acc button { flex: 1; padding: 12px 8px; font-size: 16px; }
+  body.modo-mobile .ej-cols { flex-direction: column; gap: 12px; }
+  body.modo-mobile .ej-row input[type=text] { font-size: 16px; }
+  body.modo-mobile .ej-row .chico { padding: 10px; font-size: 15px; }
+  body.modo-mobile .tiempos { flex-direction: column; }
+  body.modo-mobile .tiempos label { flex: 1; }
+  body.modo-mobile .tiempos input[type=number] { width: 100%; }
 
   @media (max-width: 640px) {
     #columnas { flex-direction: column; gap: 16px; }
-    table.slots, table.slots tbody, table.slots tr, table.slots td { display: block; }
-    table.slots thead { display: none; }
-    table.slots tr { border: 1px solid #334155; border-radius: 10px; padding: 8px; margin-bottom: 10px; }
+    .ej-cols { flex-direction: column; gap: 12px; }
   }
 </style>
 </head>
@@ -303,8 +294,13 @@
         <label style="font-size:14px;opacity:.8">Rutina:&nbsp;</label>
         <select id="ed-sel-rutina"></select>
         <input id="ed-nombre" type="text" placeholder="Nombre de la rutina" style="min-width:200px">
-        <button id="ed-add-set" class="primario">+ Agregar set</button>
       </div>
+      <div class="tiempos">
+        <label><span>Trabajo (s)</span><input type="number" min="0" id="ed-trabajo"></label>
+        <label><span>Descanso entre ejercicios (s)</span><input type="number" min="0" id="ed-descEj"></label>
+        <label><span>Descanso entre sets (s)</span><input type="number" min="0" id="ed-descSet"></label>
+      </div>
+      <div class="fila-rutina"><button id="ed-add-set" class="primario">+ Agregar set</button></div>
       <div id="ed-sets"></div>
     </div>
   </div>
@@ -339,12 +335,10 @@ const uid = () => "e" + Date.now().toString(36) + Math.random().toString(36).sli
 const clampInt = (v, min = 0) => Math.max(min, Math.floor(Number(v) || 0));
 
 /* ------------------ Datos por defecto (semilla) ------------------ */
-function slot(trabajo, descanso, m, d) {
-  return { trabajo, descanso, ejercicioMartin: m, ejercicioDaniela: d };
-}
-function set(descansoEntreSets, slots) {
-  return { descansoEntreSets, slots };
-}
+/* Modelo v2: cada rutina tiene tiempos únicos (trabajo, descansoEjercicio,
+   descansoSet) y cada set tiene dos listas de ejercicios: martin y daniela.
+   En la clase, el ejercicio i de Martin va en paralelo con el i de Daniela. */
+function mkSet(martin, daniela) { return { martin, daniela }; }
 function seedDefault() {
   const cat = [
     "Burpees", "Sentadillas", "Flexiones", "Plancha", "Mountain climbers",
@@ -355,84 +349,83 @@ function seedDefault() {
 
   const rutinas = {
     lunes: {
-      nombre: "Lunes",
+      nombre: "Lunes", trabajo: 30, descansoEjercicio: 15, descansoSet: 60,
       sets: [
-        set(60, [
-          slot(30, 15, "Burpees", "Sentadillas"),
-          slot(30, 15, "Flexiones", "Zancadas"),
-          slot(30, 15, "Mountain climbers", "Puente de glúteo"),
-          slot(30, 15, "Abdominales", "Saltos de tijera"),
-          slot(30, 15, "Plancha", "Russian twist"),
-          slot(30, 15, "Sentadilla con salto", "Superman"),
-        ]),
-        set(0, [
-          slot(30, 15, "Sentadillas", "Burpees"),
-          slot(30, 15, "Zancadas", "Flexiones"),
-          slot(30, 15, "Puente de glúteo", "Mountain climbers"),
-          slot(30, 15, "Saltos de tijera", "Abdominales"),
-          slot(30, 15, "Russian twist", "Plancha"),
-          slot(30, 15, "Superman", "Sentadilla con salto"),
-        ]),
+        mkSet(
+          ["Burpees", "Flexiones", "Mountain climbers", "Abdominales", "Plancha", "Sentadilla con salto"],
+          ["Sentadillas", "Zancadas", "Puente de glúteo", "Saltos de tijera", "Russian twist", "Superman"]
+        ),
+        mkSet(
+          ["Sentadillas", "Zancadas", "Puente de glúteo", "Saltos de tijera", "Russian twist", "Superman"],
+          ["Burpees", "Flexiones", "Mountain climbers", "Abdominales", "Plancha", "Sentadilla con salto"]
+        ),
       ],
     },
     martes: {
-      nombre: "Martes",
+      nombre: "Martes", trabajo: 20, descansoEjercicio: 10, descansoSet: 60,
       sets: [
-        set(60, [
-          slot(20, 10, "Saltos de tijera", "Escaladores"),
-          slot(20, 10, "Patada de glúteo", "Elevación de rodillas"),
-          slot(20, 10, "Plancha lateral", "Tijeras"),
-          slot(20, 10, "Salto a la comba", "Abdominales"),
-          slot(20, 10, "Sentadillas", "Flexiones"),
-          slot(20, 10, "Burpees", "Plancha"),
-          slot(20, 10, "Zancadas", "Russian twist"),
-          slot(20, 10, "Mountain climbers", "Superman"),
-        ]),
-        set(0, [
-          slot(20, 10, "Escaladores", "Saltos de tijera"),
-          slot(20, 10, "Elevación de rodillas", "Patada de glúteo"),
-          slot(20, 10, "Tijeras", "Plancha lateral"),
-          slot(20, 10, "Abdominales", "Salto a la comba"),
-          slot(20, 10, "Flexiones", "Sentadillas"),
-          slot(20, 10, "Plancha", "Burpees"),
-          slot(20, 10, "Russian twist", "Zancadas"),
-          slot(20, 10, "Superman", "Mountain climbers"),
-        ]),
+        mkSet(
+          ["Saltos de tijera", "Patada de glúteo", "Plancha lateral", "Salto a la comba", "Sentadillas", "Burpees", "Zancadas", "Mountain climbers"],
+          ["Escaladores", "Elevación de rodillas", "Tijeras", "Abdominales", "Flexiones", "Plancha", "Russian twist", "Superman"]
+        ),
+        mkSet(
+          ["Escaladores", "Elevación de rodillas", "Tijeras", "Abdominales", "Flexiones", "Plancha", "Russian twist", "Superman"],
+          ["Saltos de tijera", "Patada de glúteo", "Plancha lateral", "Salto a la comba", "Sentadillas", "Burpees", "Zancadas", "Mountain climbers"]
+        ),
       ],
     },
     jueves: {
-      nombre: "Jueves",
+      nombre: "Jueves", trabajo: 40, descansoEjercicio: 20, descansoSet: 90,
       sets: [
-        set(90, [
-          slot(40, 20, "Burpees", "Sentadilla con salto"),
-          slot(40, 20, "Zancadas", "Flexiones"),
-          slot(40, 20, "Mountain climbers", "Plancha"),
-          slot(40, 20, "Abdominales", "Puente de glúteo"),
-          slot(40, 20, "Saltos de tijera", "Russian twist"),
-        ]),
-        set(0, [
-          slot(40, 20, "Sentadilla con salto", "Burpees"),
-          slot(40, 20, "Flexiones", "Zancadas"),
-          slot(40, 20, "Plancha", "Mountain climbers"),
-          slot(40, 20, "Puente de glúteo", "Abdominales"),
-          slot(40, 20, "Russian twist", "Saltos de tijera"),
-        ]),
+        mkSet(
+          ["Burpees", "Zancadas", "Mountain climbers", "Abdominales", "Saltos de tijera"],
+          ["Sentadilla con salto", "Flexiones", "Plancha", "Puente de glúteo", "Russian twist"]
+        ),
+        mkSet(
+          ["Sentadilla con salto", "Flexiones", "Plancha", "Puente de glúteo", "Russian twist"],
+          ["Burpees", "Zancadas", "Mountain climbers", "Abdominales", "Saltos de tijera"]
+        ),
       ],
     },
   };
-  return { version: 1, catalogo: cat, rutinas };
+  return { version: 2, catalogo: cat, rutinas };
 }
 
 /* ------------------ Persistencia ------------------ */
 const STORAGE_KEY = "tabata_v1";
 const PREF_KEY = "tabata_pref";
 
+/* Convierte datos del modelo viejo (v1: slots con trabajo/descanso por ejercicio)
+   al nuevo (v2: tiempos por rutina + listas martin/daniela por set). */
+function migrarV1aV2(d) {
+  Object.values(d.rutinas || {}).forEach((r) => {
+    if (!Array.isArray(r.sets)) r.sets = [];
+    const primerSlot = (r.sets[0] && r.sets[0].slots && r.sets[0].slots[0]) || null;
+    if (r.trabajo == null) r.trabajo = primerSlot ? clampInt(primerSlot.trabajo) : 30;
+    if (r.descansoEjercicio == null) r.descansoEjercicio = primerSlot ? clampInt(primerSlot.descanso) : 15;
+    if (r.descansoSet == null) {
+      const conDesc = r.sets.find((s) => clampInt(s.descansoEntreSets) > 0);
+      r.descansoSet = conDesc ? clampInt(conDesc.descansoEntreSets) : 60;
+    }
+    r.sets = r.sets.map((s) => {
+      if (Array.isArray(s.martin) && Array.isArray(s.daniela)) return { martin: s.martin, daniela: s.daniela };
+      const slots = s.slots || [];
+      return {
+        martin: slots.map((x) => x.ejercicioMartin || ""),
+        daniela: slots.map((x) => x.ejercicioDaniela || ""),
+      };
+    });
+  });
+  d.version = 2;
+  return d;
+}
 function cargarDatos() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return seedDefault();
     const d = JSON.parse(raw);
     if (!d || !d.rutinas) return seedDefault();
+    if (d.version !== 2) return migrarV1aV2(d);
     return d;
   } catch (e) {
     console.warn("No se pudo leer localStorage, uso semilla.", e);
@@ -507,30 +500,31 @@ function tonoFin() {
 }
 
 /* ------------------ Motor del timer ------------------ */
+function numEjerciciosSet(s) {
+  return Math.max(((s && s.martin) || []).length, ((s && s.daniela) || []).length);
+}
 function construirFases(rutina) {
   const fases = [];
-  const sets = (rutina && rutina.sets) || [];
+  if (!rutina) return fases;
+  const sets = rutina.sets || [];
+  const trabajo = clampInt(rutina.trabajo);
+  const descEj = clampInt(rutina.descansoEjercicio);
+  const descSet = clampInt(rutina.descansoSet);
   sets.forEach((s, si) => {
-    const slots = s.slots || [];
-    slots.forEach((sl, sli) => {
-      if (clampInt(sl.trabajo) > 0) {
-        fases.push({
-          tipo: "trabajo", duracion: clampInt(sl.trabajo),
-          setIndex: si, slotIndex: sli,
-          martin: sl.ejercicioMartin || "—", daniela: sl.ejercicioDaniela || "—",
-        });
+    const M = s.martin || [], D = s.daniela || [];
+    const n = numEjerciciosSet(s);
+    for (let i = 0; i < n; i++) {
+      const m = M[i] || "—", d = D[i] || "—";
+      if (trabajo > 0) {
+        fases.push({ tipo: "trabajo", duracion: trabajo, setIndex: si, slotIndex: i, martin: m, daniela: d });
       }
-      if (clampInt(sl.descanso) > 0) {
-        fases.push({
-          tipo: "descanso", duracion: clampInt(sl.descanso),
-          setIndex: si, slotIndex: sli,
-          martin: sl.ejercicioMartin || "—", daniela: sl.ejercicioDaniela || "—",
-        });
+      const ultimoEj = (i === n - 1);
+      const ultimoSet = (si === sets.length - 1);
+      if (!ultimoEj) {
+        if (descEj > 0) fases.push({ tipo: "descanso", duracion: descEj, setIndex: si, slotIndex: i, martin: m, daniela: d });
+      } else if (!ultimoSet && descSet > 0) {
+        fases.push({ tipo: "descansoSet", duracion: descSet, setIndex: si, slotIndex: null });
       }
-    });
-    // descanso entre sets: aplica DESPUÉS del set (no después del último)
-    if (clampInt(s.descansoEntreSets) > 0 && si < sets.length - 1) {
-      fases.push({ tipo: "descansoSet", duracion: clampInt(s.descansoEntreSets), setIndex: si, slotIndex: null });
     }
   });
   return fases;
@@ -713,7 +707,7 @@ function renderEjecucion() {
   if (f.tipo === "descansoSet") {
     $("#progreso").textContent = `Set ${f.setIndex + 1} de ${totalSets} · Descanso → Set ${f.setIndex + 2}`;
   } else {
-    const slotsEnSet = rutina.sets[f.setIndex].slots.length;
+    const slotsEnSet = numEjerciciosSet(rutina.sets[f.setIndex]);
     $("#progreso").textContent = `Set ${f.setIndex + 1} de ${totalSets} · Ejercicio ${f.slotIndex + 1} de ${slotsEnSet}`;
   }
 
@@ -790,68 +784,54 @@ function renderEditor() {
   poblarSelectores();
   const r = rutinaEd();
   $("#ed-nombre").value = r.nombre;
+  $("#ed-trabajo").value = clampInt(r.trabajo);
+  $("#ed-descEj").value = clampInt(r.descansoEjercicio);
+  $("#ed-descSet").value = clampInt(r.descansoSet);
   const cont = $("#ed-sets");
   cont.innerHTML = r.sets.map((s, si) => setCardHTML(s, si)).join("");
   refrescarDatalist();
 }
 
+function colHTML(quien, lista, si) {
+  const titulo = quien === "martin" ? "MARTIN" : "DANIELA";
+  const items = (lista || []).map((ej, i) => `
+    <div class="ej-row">
+      <span class="ej-num">${i + 1}</span>
+      <input type="text" list="lista-ejercicios" data-campo="ej" data-set="${si}" data-quien="${quien}" data-idx="${i}" value="${escapeAttr(ej || "")}" placeholder="Ejercicio">
+      <button class="chico" data-accion="up-ej" data-set="${si}" data-quien="${quien}" data-idx="${i}" title="Subir">↑</button>
+      <button class="chico" data-accion="down-ej" data-set="${si}" data-quien="${quien}" data-idx="${i}" title="Bajar">↓</button>
+      <button class="chico peligro" data-accion="del-ej" data-set="${si}" data-quien="${quien}" data-idx="${i}" title="Borrar">✕</button>
+    </div>`).join("");
+  return `
+    <div class="ej-col col-${quien}">
+      <div class="ej-col-tit">${titulo}</div>
+      ${items}
+      <button class="chico add-ej" data-accion="add-ej" data-set="${si}" data-quien="${quien}">+ Agregar ejercicio</button>
+    </div>`;
+}
 function setCardHTML(s, si) {
-  const filas = s.slots.map((sl, sli) => `
-    <tr data-set="${si}" data-slot="${sli}">
-      <td class="num" data-label="Ejercicio">${sli + 1}</td>
-      <td data-label="Trabajo (s)"><input type="number" min="0" data-campo="trabajo" data-set="${si}" data-slot="${sli}" value="${clampInt(sl.trabajo)}"></td>
-      <td data-label="Descanso (s)"><input type="number" min="0" data-campo="descanso" data-set="${si}" data-slot="${sli}" value="${clampInt(sl.descanso)}"></td>
-      <td data-label="Martin"><input type="text" list="lista-ejercicios" data-campo="martin" data-set="${si}" data-slot="${sli}" value="${escapeAttr(sl.ejercicioMartin || "")}" placeholder="Ejercicio de Martin"></td>
-      <td data-label="Daniela"><input type="text" list="lista-ejercicios" data-campo="daniela" data-set="${si}" data-slot="${sli}" value="${escapeAttr(sl.ejercicioDaniela || "")}" placeholder="Ejercicio de Daniela"></td>
-      <td class="acc">
-        <button class="chico" data-accion="up-slot" data-set="${si}" data-slot="${sli}" title="Subir">↑</button>
-        <button class="chico" data-accion="down-slot" data-set="${si}" data-slot="${sli}" title="Bajar">↓</button>
-        <button class="chico peligro" data-accion="del-slot" data-set="${si}" data-slot="${sli}" title="Borrar">✕</button>
-      </td>
-    </tr>`).join("");
-
   return `
   <div class="set-card" data-set="${si}">
     <div class="set-head">
       <span class="nom">Set ${si + 1}</span>
-      <label>Descanso entre sets (s):
-        <input type="number" min="0" data-campo="descansoEntreSets" data-set="${si}" value="${clampInt(s.descansoEntreSets)}">
-      </label>
       <button class="chico" data-accion="up-set" data-set="${si}" title="Subir set">↑</button>
       <button class="chico" data-accion="down-set" data-set="${si}" title="Bajar set">↓</button>
       <button class="chico peligro" data-accion="del-set" data-set="${si}">✕ Set</button>
     </div>
-    <div class="aplicar">
-      Aplicar a todo el set →
-      Trabajo <input type="number" min="0" id="apl-t-${si}" value="${s.slots[0] ? clampInt(s.slots[0].trabajo) : 30}">s
-      Descanso <input type="number" min="0" id="apl-d-${si}" value="${s.slots[0] ? clampInt(s.slots[0].descanso) : 15}">s
-      <button class="chico" data-accion="aplicar-set" data-set="${si}">Aplicar</button>
+    <div class="ej-cols">
+      ${colHTML("martin", s.martin, si)}
+      ${colHTML("daniela", s.daniela, si)}
     </div>
-    <table class="slots">
-      <thead><tr><th></th><th>Trabajo (s)</th><th>Descanso (s)</th><th>Martin</th><th>Daniela</th><th></th></tr></thead>
-      <tbody>${filas}</tbody>
-    </table>
-    <div style="margin-top:10px"><button class="chico" data-accion="add-slot" data-set="${si}">+ Agregar ejercicio</button></div>
   </div>`;
 }
 
-// Cambios de valor (sin re-render para no perder el foco)
+// Cambios de valor en los ejercicios (sin re-render para no perder el foco)
 $("#ed-sets").addEventListener("input", (e) => {
   const t = e.target;
-  const campo = t.dataset.campo;
-  if (!campo) return;
+  if (t.dataset.campo !== "ej") return;
   const r = rutinaEd();
-  const si = +t.dataset.set;
-  if (campo === "descansoEntreSets") {
-    r.sets[si].descansoEntreSets = clampInt(t.value);
-  } else if (t.dataset.slot !== undefined) {
-    const sli = +t.dataset.slot;
-    const sl = r.sets[si].slots[sli];
-    if (campo === "trabajo") sl.trabajo = clampInt(t.value);
-    else if (campo === "descanso") sl.descanso = clampInt(t.value);
-    else if (campo === "martin") sl.ejercicioMartin = t.value;
-    else if (campo === "daniela") sl.ejercicioDaniela = t.value;
-  }
+  const si = +t.dataset.set, quien = t.dataset.quien, idx = +t.dataset.idx;
+  if (r.sets[si] && r.sets[si][quien]) r.sets[si][quien][idx] = t.value;
   guardarDatos();
   flashGuardado("guardado-ed");
 });
@@ -863,28 +843,24 @@ $("#ed-sets").addEventListener("click", (e) => {
   const acc = btn.dataset.accion;
   const r = rutinaEd();
   const si = +btn.dataset.set;
+  const quien = btn.dataset.quien;
+  const idx = btn.dataset.idx !== undefined ? +btn.dataset.idx : -1;
 
-  if (acc === "add-slot") {
-    const ult = r.sets[si].slots[r.sets[si].slots.length - 1];
-    r.sets[si].slots.push(slot(ult ? ult.trabajo : 30, ult ? ult.descanso : 15, "", ""));
-  } else if (acc === "del-slot") {
-    r.sets[si].slots.splice(+btn.dataset.slot, 1);
-  } else if (acc === "up-slot") {
-    mover(r.sets[si].slots, +btn.dataset.slot, -1);
-  } else if (acc === "down-slot") {
-    mover(r.sets[si].slots, +btn.dataset.slot, +1);
+  if (acc === "add-ej") {
+    r.sets[si][quien].push("");
+  } else if (acc === "del-ej") {
+    r.sets[si][quien].splice(idx, 1);
+  } else if (acc === "up-ej") {
+    mover(r.sets[si][quien], idx, -1);
+  } else if (acc === "down-ej") {
+    mover(r.sets[si][quien], idx, +1);
   } else if (acc === "del-set") {
-    if (r.sets.length > 1 && confirm("¿Borrar este set completo?")) r.sets.splice(si, 1);
-    else if (r.sets.length <= 1) alert("La rutina debe tener al menos un set.");
-    else return;
+    if (r.sets.length > 1) { if (!confirm("¿Borrar este set completo?")) return; r.sets.splice(si, 1); }
+    else { alert("La rutina debe tener al menos un set."); return; }
   } else if (acc === "up-set") {
     mover(r.sets, si, -1);
   } else if (acc === "down-set") {
     mover(r.sets, si, +1);
-  } else if (acc === "aplicar-set") {
-    const t = clampInt($("#apl-t-" + si).value);
-    const d = clampInt($("#apl-d-" + si).value);
-    r.sets[si].slots.forEach((sl) => { sl.trabajo = t; sl.descanso = d; });
   }
   guardarDatos();
   flashGuardado("guardado-ed");
@@ -905,9 +881,18 @@ $("#ed-nombre").addEventListener("input", (e) => {
 });
 $("#ed-add-set").addEventListener("click", () => {
   const r = rutinaEd();
-  r.sets.push(set(60, [slot(30, 15, "", "")]));
+  r.sets.push({ martin: [""], daniela: [""] });
   guardarDatos(); flashGuardado("guardado-ed"); renderEditor();
 });
+function bindTiempoRutina(id, campo) {
+  $("#" + id).addEventListener("input", (e) => {
+    rutinaEd()[campo] = clampInt(e.target.value);
+    guardarDatos(); flashGuardado("guardado-ed");
+  });
+}
+bindTiempoRutina("ed-trabajo", "trabajo");
+bindTiempoRutina("ed-descEj", "descansoEjercicio");
+bindTiempoRutina("ed-descSet", "descansoSet");
 
 /* ============================================================
    CATÁLOGO DE EJERCICIOS
@@ -1008,9 +993,8 @@ function toggleModo() {
    ARRANQUE
    ============================================================ */
 function init() {
-  const habiaDatos = !!localStorage.getItem(STORAGE_KEY);
   APP.data = cargarDatos();
-  if (!habiaDatos) guardarDatos(); // persistir la semilla en el primer arranque
+  guardarDatos(); // persistir la semilla nueva o los datos migrados a v2
   const pref = cargarPref();
   if (pref.rutina && APP.data.rutinas[pref.rutina]) APP.rutinaKey = pref.rutina;
   poblarSelectores();
