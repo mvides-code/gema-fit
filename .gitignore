@@ -11,3 +11,6 @@ zz*.html
 
 # Carpeta de publicacion (solo assets del sitio)
 .deploy/
+
+# Estado local de wrangler
+.wrangler/
