@@ -5,3 +5,9 @@
 .claude/
 .tools/
 zz*.html
+
+# Script de login local
+*.command
+
+# Carpeta de publicacion (solo assets del sitio)
+.deploy/
