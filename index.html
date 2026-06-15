@@ -129,6 +129,9 @@
   }
   .col.m .quien { color: #bae6fd; }
   .col.d .quien { color: #fbcfe8; }
+  body.vista-calor #columnas .col.d { display: none; }
+  body.vista-calor #columnas .col.m { max-width: 1000px; }
+  body.vista-calor .col.m .quien { color: #fbbf24; }
 
   #preview {
     margin-top: 26px; font-size: clamp(14px, 2.2vw, 26px);
@@ -191,6 +194,10 @@
   .ej-row input[type=text] { flex: 1; min-width: 0; }
   .ej-row .chico { padding: 6px 8px; font-size: 13px; }
   .add-ej { margin-top: 4px; }
+
+  .calor-card { border-color: #b45309; }
+  .calor-tiempos { background: #0f172a; margin-bottom: 10px; }
+  .calor-tit { color: #fbbf24; }
 
   .catalogo-lista { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
   .cat-row { display: flex; gap: 8px; align-items: center; }
@@ -300,6 +307,7 @@
         <label><span>Descanso entre ejercicios (s)</span><input type="number" min="0" id="ed-descEj"></label>
         <label><span>Descanso entre sets (s)</span><input type="number" min="0" id="ed-descSet"></label>
       </div>
+      <div id="ed-calor"></div>
       <div class="fila-rutina"><button id="ed-add-set" class="primario">+ Agregar set</button></div>
       <div id="ed-sets"></div>
     </div>
@@ -344,12 +352,20 @@ function seedDefault() {
     "Burpees", "Sentadillas", "Flexiones", "Plancha", "Mountain climbers",
     "Saltos de tijera", "Abdominales", "Zancadas", "Escaladores", "Puente de glúteo",
     "Russian twist", "Salto a la comba", "Sentadilla con salto", "Patada de glúteo",
-    "Elevación de rodillas", "Superman", "Plancha lateral", "Tijeras"
+    "Elevación de rodillas", "Superman", "Plancha lateral", "Tijeras",
+    "Jumping jacks", "Rotación de hombros", "Rotación de cadera", "Marcha en el lugar",
+    "Estocadas suaves", "Sentadillas suaves"
   ].map((n) => ({ id: uid(), nombre: n }));
+
+  // Entrada en calor compartida de ejemplo (la misma para los dos)
+  const calor = () => ({
+    repeticiones: 2, trabajo: 20, descansoEjercicio: 10,
+    ejercicios: ["Jumping jacks", "Rotación de hombros", "Rotación de cadera", "Marcha en el lugar", "Estocadas suaves", "Sentadillas suaves"]
+  });
 
   const rutinas = {
     lunes: {
-      nombre: "Lunes", trabajo: 30, descansoEjercicio: 15, descansoSet: 60,
+      nombre: "Lunes", trabajo: 30, descansoEjercicio: 15, descansoSet: 60, entradaCalor: calor(),
       sets: [
         mkSet(
           ["Burpees", "Flexiones", "Mountain climbers", "Abdominales", "Plancha", "Sentadilla con salto"],
@@ -362,7 +378,7 @@ function seedDefault() {
       ],
     },
     martes: {
-      nombre: "Martes", trabajo: 20, descansoEjercicio: 10, descansoSet: 60,
+      nombre: "Martes", trabajo: 20, descansoEjercicio: 10, descansoSet: 60, entradaCalor: calor(),
       sets: [
         mkSet(
           ["Saltos de tijera", "Patada de glúteo", "Plancha lateral", "Salto a la comba", "Sentadillas", "Burpees", "Zancadas", "Mountain climbers"],
@@ -375,7 +391,7 @@ function seedDefault() {
       ],
     },
     jueves: {
-      nombre: "Jueves", trabajo: 40, descansoEjercicio: 20, descansoSet: 90,
+      nombre: "Jueves", trabajo: 40, descansoEjercicio: 20, descansoSet: 90, entradaCalor: calor(),
       sets: [
         mkSet(
           ["Burpees", "Zancadas", "Mountain climbers", "Abdominales", "Saltos de tijera"],
@@ -510,6 +526,32 @@ function construirFases(rutina) {
   const trabajo = clampInt(rutina.trabajo);
   const descEj = clampInt(rutina.descansoEjercicio);
   const descSet = clampInt(rutina.descansoSet);
+
+  // Entrada en calor (opcional): lista única compartida, repetida N veces,
+  // con sólo descanso entre ejercicios entre las vueltas (sin descanso de set).
+  const ec = rutina.entradaCalor;
+  const ejsCalor = ec ? (ec.ejercicios || []).map((x) => (x || "").trim()).filter((x) => x.length) : [];
+  if (ejsCalor.length) {
+    const ecTrab = clampInt(ec.trabajo);
+    const ecDesc = clampInt(ec.descansoEjercicio);
+    const reps = Math.max(1, clampInt(ec.repeticiones) || 1);
+    for (let v = 0; v < reps; v++) {
+      for (let i = 0; i < ejsCalor.length; i++) {
+        const ej = ejsCalor[i];
+        if (ecTrab > 0) fases.push({ tipo: "trabajo", duracion: ecTrab, calor: true, vuelta: v, ejIdx: i, totalEj: ejsCalor.length, reps: reps, martin: ej, daniela: ej });
+        const ultimoGlobal = (v === reps - 1 && i === ejsCalor.length - 1);
+        if (!ultimoGlobal && ecDesc > 0) {
+          fases.push({ tipo: "descanso", duracion: ecDesc, calor: true, vuelta: v, ejIdx: i, totalEj: ejsCalor.length, reps: reps, martin: ej, daniela: ej });
+        }
+      }
+    }
+    // breve transición hacia el entrenamiento (descanso de set), si hay workout
+    const hayWorkout = (rutina.sets || []).some((s) => numEjerciciosSet(s) > 0);
+    if (hayWorkout && descSet > 0) {
+      fases.push({ tipo: "descansoSet", duracion: descSet, transicionCalor: true });
+    }
+  }
+
   sets.forEach((s, si) => {
     const M = s.martin || [], D = s.daniela || [];
     const n = numEjerciciosSet(s);
@@ -602,12 +644,16 @@ function anterior() {
 function reiniciarSlot() {
   if (!APP.fases.length) return;
   const actual = APP.fases[APP.idx] || APP.fases[APP.fases.length - 1];
-  const si = actual ? actual.setIndex : 0;
-  const sli = actual ? actual.slotIndex : null;
+  if (!actual) return;
   let destino = APP.idx;
   for (let k = 0; k < APP.fases.length; k++) {
     const f = APP.fases[k];
-    if (f.tipo === "trabajo" && f.setIndex === si && f.slotIndex === sli) { destino = k; break; }
+    if (f.tipo !== "trabajo") continue;
+    if (actual.calor) {
+      if (f.calor && f.vuelta === actual.vuelta && f.ejIdx === actual.ejIdx) { destino = k; break; }
+    } else if (!f.calor && f.setIndex === actual.setIndex && f.slotIndex === actual.slotIndex) {
+      destino = k; break;
+    }
   }
   entrarFase(destino);
 }
@@ -672,6 +718,8 @@ function renderControles() {
 function renderEjecucion() {
   renderControles();
   const rutina = APP.data.rutinas[APP.rutinaKey];
+  document.body.classList.remove("vista-calor");
+  const _quienM = $(".col.m .quien"); if (_quienM) _quienM.innerHTML = 'MARTIN <span class="flecha">→</span>';
 
   // Rutina vacía
   if (!APP.fases.length) {
@@ -698,13 +746,17 @@ function renderEjecucion() {
   const f = APP.fases[APP.idx];
 
   // Fondo + etiqueta de estado
-  if (f.tipo === "trabajo") { setEstadoBody("estado-trabajo"); $("#estado").textContent = "TRABAJO"; }
-  else if (f.tipo === "descansoSet") { setEstadoBody("estado-descansoSet"); $("#estado").textContent = "DESCANSO ENTRE SETS"; }
+  if (f.tipo === "trabajo") { setEstadoBody("estado-trabajo"); $("#estado").textContent = f.calor ? "🔥 ENTRADA EN CALOR" : "TRABAJO"; }
+  else if (f.tipo === "descansoSet") { setEstadoBody("estado-descansoSet"); $("#estado").textContent = f.transicionCalor ? "¡A ENTRENAR!" : "DESCANSO ENTRE SETS"; }
   else { setEstadoBody("estado-descanso"); $("#estado").textContent = "DESCANSO"; }
 
   // Progreso: Set X de N · Ejercicio J de M
   const totalSets = rutina.sets.length;
-  if (f.tipo === "descansoSet") {
+  if (f.transicionCalor) {
+    $("#progreso").textContent = "Entrada en calor → ¡arranca el entrenamiento!";
+  } else if (f.calor) {
+    $("#progreso").textContent = `Entrada en calor · Vuelta ${f.vuelta + 1} de ${f.reps} · Ejercicio ${f.ejIdx + 1} de ${f.totalEj}`;
+  } else if (f.tipo === "descansoSet") {
     $("#progreso").textContent = `Set ${f.setIndex + 1} de ${totalSets} · Descanso → Set ${f.setIndex + 2}`;
   } else {
     const slotsEnSet = numEjerciciosSet(rutina.sets[f.setIndex]);
@@ -714,6 +766,10 @@ function renderEjecucion() {
   // Columnas: durante trabajo, el slot actual; durante descanso, el próximo slot (preparación)
   const idxTrab = indiceTrabajoMostrado(APP.idx);
   const ft = idxTrab >= 0 ? APP.fases[idxTrab] : null;
+  if (ft && ft.calor) {
+    document.body.classList.add("vista-calor");
+    if (_quienM) _quienM.innerHTML = 'LOS DOS <span class="flecha">→</span>';
+  }
   const prefijo = (f.tipo === "trabajo") ? "" : "Prepará: ";
   $("#ej-martin").textContent = ft ? prefijo + ft.martin : "— Fin —";
   $("#ej-daniela").textContent = ft ? prefijo + ft.daniela : "— Fin —";
@@ -722,7 +778,7 @@ function renderEjecucion() {
   const idxPrev = siguienteTrabajo(idxTrab >= 0 ? idxTrab : APP.idx);
   if (idxPrev >= 0) {
     const fp = APP.fases[idxPrev];
-    $("#prev-txt").textContent = `M: ${fp.martin}  ·  D: ${fp.daniela}`;
+    $("#prev-txt").textContent = fp.calor ? fp.martin : `M: ${fp.martin}  ·  D: ${fp.daniela}`;
   } else {
     $("#prev-txt").textContent = "fin de la rutina";
   }
@@ -787,9 +843,53 @@ function renderEditor() {
   $("#ed-trabajo").value = clampInt(r.trabajo);
   $("#ed-descEj").value = clampInt(r.descansoEjercicio);
   $("#ed-descSet").value = clampInt(r.descansoSet);
+  renderCalor();
   const cont = $("#ed-sets");
   cont.innerHTML = r.sets.map((s, si) => setCardHTML(s, si)).join("");
   refrescarDatalist();
+}
+
+function nuevaEntradaCalor(r) {
+  return {
+    repeticiones: 2,
+    trabajo: clampInt(r.trabajo) || 20,
+    descansoEjercicio: clampInt(r.descansoEjercicio) || 10,
+    ejercicios: ["", "", "", "", "", ""],
+  };
+}
+function renderCalor() {
+  const r = rutinaEd();
+  const cont = $("#ed-calor");
+  const ec = r.entradaCalor;
+  if (!ec) {
+    cont.innerHTML = `<button class="chico" id="ec-agregar">🔥 + Agregar entrada en calor</button>`;
+    return;
+  }
+  const items = (ec.ejercicios || []).map((ej, i) => `
+    <div class="ej-row">
+      <span class="ej-num">${i + 1}</span>
+      <input type="text" list="lista-ejercicios" data-campo="ec-ej" data-idx="${i}" value="${escapeAttr(ej || "")}" placeholder="Ejercicio">
+      <button class="chico" data-accion="ec-up" data-idx="${i}" title="Subir">↑</button>
+      <button class="chico" data-accion="ec-down" data-idx="${i}" title="Bajar">↓</button>
+      <button class="chico peligro" data-accion="ec-del" data-idx="${i}" title="Borrar">✕</button>
+    </div>`).join("");
+  cont.innerHTML = `
+    <div class="set-card calor-card">
+      <div class="set-head">
+        <span class="nom">🔥 Entrada en calor</span>
+        <button class="chico peligro" id="ec-quitar">Quitar</button>
+      </div>
+      <div class="tiempos calor-tiempos">
+        <label><span>Repeticiones</span><input type="number" min="1" data-campo="ec-rep" value="${Math.max(1, clampInt(ec.repeticiones) || 1)}"></label>
+        <label><span>Trabajo (s)</span><input type="number" min="0" data-campo="ec-trabajo" value="${clampInt(ec.trabajo)}"></label>
+        <label><span>Descanso entre ejercicios (s)</span><input type="number" min="0" data-campo="ec-descEj" value="${clampInt(ec.descansoEjercicio)}"></label>
+      </div>
+      <div class="ej-col">
+        <div class="ej-col-tit calor-tit">EJERCICIOS · los hacen los dos</div>
+        ${items}
+        <button class="chico add-ej" data-accion="ec-add">+ Agregar ejercicio</button>
+      </div>
+    </div>`;
 }
 
 function colHTML(quien, lista, si) {
@@ -893,6 +993,45 @@ function bindTiempoRutina(id, campo) {
 bindTiempoRutina("ed-trabajo", "trabajo");
 bindTiempoRutina("ed-descEj", "descansoEjercicio");
 bindTiempoRutina("ed-descSet", "descansoSet");
+
+// ---- Entrada en calor ----
+$("#ed-calor").addEventListener("input", (e) => {
+  const t = e.target, campo = t.dataset.campo;
+  if (!campo) return;
+  const ec = rutinaEd().entradaCalor;
+  if (!ec) return;
+  if (campo === "ec-ej") ec.ejercicios[+t.dataset.idx] = t.value;
+  else if (campo === "ec-rep") ec.repeticiones = Math.max(1, clampInt(t.value));
+  else if (campo === "ec-trabajo") ec.trabajo = clampInt(t.value);
+  else if (campo === "ec-descEj") ec.descansoEjercicio = clampInt(t.value);
+  guardarDatos();
+  flashGuardado("guardado-ed");
+});
+$("#ed-calor").addEventListener("click", (e) => {
+  const r = rutinaEd();
+  if (e.target.id === "ec-agregar") {
+    r.entradaCalor = nuevaEntradaCalor(r);
+    guardarDatos(); flashGuardado("guardado-ed"); renderCalor(); return;
+  }
+  if (e.target.id === "ec-quitar") {
+    if (!confirm("¿Quitar la entrada en calor de esta rutina?")) return;
+    delete r.entradaCalor;
+    guardarDatos(); flashGuardado("guardado-ed"); renderCalor(); return;
+  }
+  const btn = e.target.closest("button[data-accion]");
+  if (!btn) return;
+  const ec = r.entradaCalor;
+  if (!ec) return;
+  const acc = btn.dataset.accion;
+  const idx = btn.dataset.idx !== undefined ? +btn.dataset.idx : -1;
+  if (acc === "ec-add") ec.ejercicios.push("");
+  else if (acc === "ec-del") ec.ejercicios.splice(idx, 1);
+  else if (acc === "ec-up") mover(ec.ejercicios, idx, -1);
+  else if (acc === "ec-down") mover(ec.ejercicios, idx, +1);
+  guardarDatos();
+  flashGuardado("guardado-ed");
+  renderCalor();
+});
 
 /* ============================================================
    CATÁLOGO DE EJERCICIOS
