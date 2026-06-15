@@ -58,7 +58,7 @@
   /* ===================== BARRA SUPERIOR ===================== */
   #barra {
     position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-    display: flex; align-items: center; gap: 12px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
     padding: 10px 16px;
     background: rgba(15, 23, 42, .82);
     backdrop-filter: blur(8px);
@@ -205,6 +205,7 @@
   body.modo-mobile .tabs button { flex: 1; padding: 10px 6px; }
   body.modo-mobile #sel-rutina { flex: 1; min-width: 0; }
   body.modo-mobile #p-ejecutar { padding: 118px 16px 150px; }
+  body.modo-mobile #p-editor, body.modo-mobile #p-catalogo { padding-top: 116px; }
   body.modo-mobile #btn-full { display: none; }
   body.modo-mobile #columnas { flex-direction: column; gap: 14px; }
   body.modo-mobile .col { max-width: 100%; }
@@ -221,8 +222,19 @@
   body.modo-mobile table.slots, body.modo-mobile table.slots tbody,
   body.modo-mobile table.slots tr, body.modo-mobile table.slots td { display: block; }
   body.modo-mobile table.slots thead { display: none; }
-  body.modo-mobile table.slots tr { border: 1px solid #334155; border-radius: 10px; padding: 8px; margin-bottom: 10px; }
-  body.modo-mobile table.slots input[type=number] { width: 90px; }
+  body.modo-mobile table.slots tr { border: 1px solid #334155; border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; background: #0f172a; }
+  body.modo-mobile table.slots td { display: flex; align-items: center; gap: 10px; padding: 5px 0; }
+  body.modo-mobile table.slots td::before {
+    content: attr(data-label); flex: none; min-width: 96px;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #94a3b8;
+  }
+  body.modo-mobile table.slots td.num { font-weight: 800; color: #f8fafc; opacity: 1; border-bottom: 1px solid #334155; padding-bottom: 8px; margin-bottom: 6px; font-size: 15px; }
+  body.modo-mobile table.slots td.num::before { min-width: auto; color: #60a5fa; }
+  body.modo-mobile table.slots input[type=number] { width: 110px; }
+  body.modo-mobile table.slots input[type=text] { flex: 1; min-width: 0; }
+  body.modo-mobile table.slots td.acc { justify-content: flex-end; gap: 8px; padding-top: 8px; }
+  body.modo-mobile table.slots td.acc::before { content: none; }
+  body.modo-mobile table.slots td.acc button { flex: 1; padding: 12px 8px; font-size: 16px; }
 
   @media (max-width: 640px) {
     #columnas { flex-direction: column; gap: 16px; }
@@ -786,11 +798,11 @@ function renderEditor() {
 function setCardHTML(s, si) {
   const filas = s.slots.map((sl, sli) => `
     <tr data-set="${si}" data-slot="${sli}">
-      <td class="num">${sli + 1}</td>
-      <td><input type="number" min="0" data-campo="trabajo" data-set="${si}" data-slot="${sli}" value="${clampInt(sl.trabajo)}"></td>
-      <td><input type="number" min="0" data-campo="descanso" data-set="${si}" data-slot="${sli}" value="${clampInt(sl.descanso)}"></td>
-      <td><input type="text" list="lista-ejercicios" data-campo="martin" data-set="${si}" data-slot="${sli}" value="${escapeAttr(sl.ejercicioMartin || "")}" placeholder="Ejercicio de Martin"></td>
-      <td><input type="text" list="lista-ejercicios" data-campo="daniela" data-set="${si}" data-slot="${sli}" value="${escapeAttr(sl.ejercicioDaniela || "")}" placeholder="Ejercicio de Daniela"></td>
+      <td class="num" data-label="Ejercicio">${sli + 1}</td>
+      <td data-label="Trabajo (s)"><input type="number" min="0" data-campo="trabajo" data-set="${si}" data-slot="${sli}" value="${clampInt(sl.trabajo)}"></td>
+      <td data-label="Descanso (s)"><input type="number" min="0" data-campo="descanso" data-set="${si}" data-slot="${sli}" value="${clampInt(sl.descanso)}"></td>
+      <td data-label="Martin"><input type="text" list="lista-ejercicios" data-campo="martin" data-set="${si}" data-slot="${sli}" value="${escapeAttr(sl.ejercicioMartin || "")}" placeholder="Ejercicio de Martin"></td>
+      <td data-label="Daniela"><input type="text" list="lista-ejercicios" data-campo="daniela" data-set="${si}" data-slot="${sli}" value="${escapeAttr(sl.ejercicioDaniela || "")}" placeholder="Ejercicio de Daniela"></td>
       <td class="acc">
         <button class="chico" data-accion="up-slot" data-set="${si}" data-slot="${sli}" title="Subir">↑</button>
         <button class="chico" data-accion="down-slot" data-set="${si}" data-slot="${sli}" title="Bajar">↓</button>
@@ -984,7 +996,7 @@ function aplicarModo(m) {
   APP.modo = m;
   document.body.classList.toggle("modo-mobile", m === "mobile");
   const btn = $("#btn-modo");
-  if (btn) btn.textContent = m === "mobile" ? "📱" : "💻";
+  if (btn) btn.textContent = m === "mobile" ? "💻 Web" : "📱 App";
 }
 function toggleModo() {
   const nuevo = APP.modo === "mobile" ? "desktop" : "mobile";
