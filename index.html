@@ -7,332 +7,345 @@
 <link rel="icon" href="icon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0f172a">
-<meta name="description" content="Cronómetro de Tabata del equipo GEMA — clases de Martin y Daniela con el profe Emanuel.">
+<meta name="theme-color" content="#0A0E16">
+<meta name="description" content="Cronómetro de Tabata del equipo GEMA — clases de Martín y Daniela con el profe Emanuel.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GEMA">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  /* ===================== BASE ===================== */
-  :root { color-scheme: dark; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  body {
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: #0f172a;
-    color: #f8fafc;
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
+  /* ===================== BASE / TOKENS ===================== */
+  :root{
+    --ink:#0A0E16; --panel:#111826; --panel-2:#131A28; --line:#28324a;
+    --txt:#F4F7FB; --muted:#8290AB; --accent:#F2A516;
+    --martin:#38BDF8; --daniela:#F472B6;
+    color-scheme: dark;
   }
-  button {
-    font-family: inherit;
-    cursor: pointer;
-    border: none;
-    border-radius: 10px;
-    background: #334155;
-    color: #f8fafc;
-    padding: 10px 16px;
-    font-size: 15px;
-    font-weight: 600;
-    transition: background .12s, transform .05s;
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{
+    font-family:"Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background:var(--ink); color:var(--txt);
+    height:100vh; height:100dvh;
+    display:flex; flex-direction:column; overflow:hidden;
+    -webkit-font-smoothing:antialiased;
   }
-  button:hover { background: #475569; }
-  button:active { transform: scale(.97); }
-  button.primario { background: #2563eb; }
-  button.primario:hover { background: #1d4ed8; }
-  button.peligro { background: #7f1d1d; }
-  button.peligro:hover { background: #991b1b; }
-  button.chico { padding: 6px 10px; font-size: 13px; border-radius: 8px; }
-  input, select {
-    font-family: inherit;
-    background: #1e293b;
-    border: 1px solid #334155;
-    color: #f8fafc;
-    border-radius: 8px;
-    padding: 8px 10px;
-    font-size: 15px;
+  ::selection{ background:var(--accent); color:var(--ink); }
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb{ background:#28324a; border-radius:99px; border:2px solid var(--ink); }
+  button{ font-family:inherit; cursor:pointer; border:none; border-radius:10px; background:#28324a; color:var(--txt); padding:10px 16px; font-size:15px; font-weight:600; transition:background .12s, transform .05s; }
+  button:hover{ background:#34405e; }
+  button:active{ transform:scale(.97); }
+  button.primario{ background:var(--accent); color:var(--ink); font-weight:800; }
+  button.primario:hover{ filter:brightness(1.05); }
+  button.peligro{ background:#3a1414; color:#fca5a5; }
+  button.peligro:hover{ background:#4a1a1a; }
+  button.chico{ padding:8px 12px; font-size:13px; border-radius:8px; }
+  input,select{ font-family:inherit; background:var(--panel-2); border:1px solid var(--line); color:var(--txt); border-radius:9px; padding:10px 12px; font-size:15px; }
+  input:focus,select:focus{ outline:2px solid var(--accent); outline-offset:0; border-color:transparent; }
+  select option{ background:var(--panel-2); color:var(--txt); }
+
+  @keyframes gemaPulse{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.04);} }
+
+  /* ===================== HEADER ===================== */
+  #barra{
+    display:flex; align-items:center; gap:12px; padding:12px 18px; flex:none;
+    background:rgba(10,14,22,.72); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(255,255,255,.07); position:relative; z-index:60;
   }
-  input:focus, select:focus { outline: 2px solid #3b82f6; border-color: transparent; }
+  .brand{ display:flex; align-items:center; gap:11px; }
+  .logo-img{ width:40px; height:40px; border-radius:50%; flex:none; box-shadow:0 0 0 2px rgba(242,165,22,.55), 0 6px 18px rgba(0,0,0,.45); }
+  .brand-txt{ display:flex; flex-direction:column; line-height:1; }
+  .wordmark{ font-family:"Anton",sans-serif; font-size:21px; letter-spacing:2px; }
+  .wordmark span{ color:var(--accent); }
+  .subbrand{ font-size:10px; letter-spacing:3px; color:#6B7892; font-weight:700; margin-top:2px; }
+  .tabs{ display:flex; gap:4px; margin-left:18px; background:rgba(255,255,255,.05); padding:4px; border-radius:14px; }
+  .tabs button{ background:transparent; color:#9AA7C0; padding:9px 16px; border-radius:10px; font-size:14px; font-weight:700; white-space:nowrap; }
+  .tabs button:hover{ background:rgba(255,255,255,.06); color:var(--txt); }
+  .tabs button.activa{ background:var(--accent); color:var(--ink); }
+  .tabs button.activa:hover{ background:var(--accent); }
+  .sep{ flex:1; }
+  .rutina-wrap{ position:relative; display:flex; align-items:center; min-width:0; }
+  .rutina-wrap::after{ content:"▼"; position:absolute; right:13px; color:#6B7892; pointer-events:none; font-size:11px; }
+  .rutina-label{ position:absolute; left:12px; font-size:10px; letter-spacing:1.5px; color:#6B7892; font-weight:800; pointer-events:none; }
+  #sel-rutina{ appearance:none; -webkit-appearance:none; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); font-weight:700; font-size:14px; padding:10px 34px 10px 64px; border-radius:12px; cursor:pointer; max-width:180px; text-overflow:ellipsis; }
+  .icon-btn{ width:42px; height:42px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px; color:#C4CEE2; font-size:16px; flex:none; }
 
-  /* ===================== BARRA SUPERIOR ===================== */
-  #barra {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-    display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
-    padding: 10px 16px;
-    background: rgba(15, 23, 42, .82);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid #1e293b;
-  }
-  #barra .titulo { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 16px; letter-spacing: .5px; margin-right: 6px; }
-  .logo-img { width: 30px; height: 30px; display: block; flex: none; }
-  #barra .sep { flex: 1; }
-  .tabs { display: flex; gap: 6px; }
-  .tabs button.activa { background: #2563eb; }
-  body.controles-ocultos #barra { display: none; }
+  /* foco exit */
+  #salir-foco{ display:none; position:fixed; top:16px; left:16px; z-index:80; align-items:center; gap:7px; padding:9px 15px; background:rgba(10,14,22,.66); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.18); border-radius:99px; color:#fff; font-weight:700; font-size:13px; }
+  body.foco #barra, body.foco #bottom-nav{ display:none; }
+  body.foco #salir-foco{ display:flex; }
 
-  /* ===================== PANTALLAS ===================== */
-  .pantalla { display: none; height: 100%; }
-  .pantalla.activa { display: flex; }
+  /* ===================== STAGE ===================== */
+  #stage{ position:relative; flex:1; overflow:hidden; min-height:0; }
+  .pantalla{ position:absolute; inset:0; display:none; }
+  .pantalla.activa{ display:block; }
 
-  /* ---------- EJECUCIÓN ---------- */
-  #p-ejecutar {
-    flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 64px 24px 96px;
-    transition: background .25s ease;
-    background: #0f172a;
-    position: relative;
-  }
-  body.estado-trabajo     #p-ejecutar { background: #15803d; } /* verde */
-  body.estado-descanso    #p-ejecutar { background: #c2410c; } /* naranja/rojo */
-  body.estado-descansoSet #p-ejecutar { background: #1d4ed8; } /* azul */
-  body.estado-terminado   #p-ejecutar { background: #4338ca; }
-  body.estado-idle        #p-ejecutar { background: #0f172a; }
+  /* ---------- EJECUTAR ---------- */
+  #p-ejecutar{ flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:16px 20px 96px; transition:background .4s ease; overflow:hidden; }
+  #p-ejecutar.activa{ display:flex; }
+  body.estado-idle      #p-ejecutar{ background:radial-gradient(circle at 50% 18%, #16203a, #0A0E16 72%); }
+  body.estado-trabajo   #p-ejecutar{ background:radial-gradient(circle at 50% 16%, #22C06E, #0B7A40 74%); color:#fff; }
+  body.estado-descanso  #p-ejecutar{ background:radial-gradient(circle at 50% 16%, #FB8B3C, #B0440C 74%); color:#fff; }
+  body.estado-descansoSet #p-ejecutar{ background:radial-gradient(circle at 50% 16%, #4C8DFF, #1A40C2 74%); color:#fff; }
+  body.estado-calor     #p-ejecutar{ background:radial-gradient(circle at 50% 16%, #FFC23D, #C2810A 74%); color:#10131C; }
+  body.estado-terminado #p-ejecutar{ background:radial-gradient(circle at 50% 24%, #8A7CFF, #3F2EC0 74%); color:#fff; }
 
-  #progreso {
-    font-size: clamp(16px, 2.6vw, 30px);
-    font-weight: 700; letter-spacing: 1px;
-    opacity: .92; text-transform: uppercase;
-  }
-  #estado {
-    font-size: clamp(22px, 5vw, 60px);
-    font-weight: 900; letter-spacing: 3px;
-    margin-top: 4px; text-shadow: 0 2px 8px rgba(0,0,0,.25);
-  }
-  #reloj {
-    font-variant-numeric: tabular-nums;
-    font-weight: 900; line-height: .9;
-    font-size: clamp(96px, min(28vw, 40vh), 440px);
-    margin: 8px 0 4px;
-    text-shadow: 0 6px 24px rgba(0,0,0,.28);
-  }
-  #barra-progreso {
-    width: min(80%, 900px); height: 10px; border-radius: 99px;
-    background: rgba(255,255,255,.22); overflow: hidden; margin: 6px 0 22px;
-  }
-  #barra-progreso > div { height: 100%; width: 100%; background: rgba(255,255,255,.92); border-radius: 99px; }
+  #confeti{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5; }
+  #cont-activo{ position:relative; z-index:6; display:flex; flex-direction:column; align-items:center; width:100%; max-width:1320px; }
 
-  #columnas {
-    display: flex; gap: clamp(20px, 5vw, 80px);
-    width: 100%; max-width: 1400px; justify-content: center;
-  }
-  .col { flex: 1; max-width: 620px; }
-  .col .quien {
-    font-size: clamp(16px, 2.4vw, 30px);
-    font-weight: 800; letter-spacing: 2px; opacity: .85;
-  }
-  .col .quien .flecha { opacity: .6; }
-  .col .ejercicio {
-    font-size: clamp(28px, 5.4vw, 86px);
-    font-weight: 900; line-height: 1.02; margin-top: 4px;
-    word-break: break-word; hyphens: auto;
-  }
-  .col.m .quien { color: #bae6fd; }
-  .col.d .quien { color: #fbcfe8; }
-  body.vista-calor #columnas .col.d { display: none; }
-  body.vista-calor #columnas .col.m { max-width: 1000px; }
-  body.vista-calor .col.m .quien { color: #fbbf24; }
+  #estado{ display:inline-flex; align-items:center; gap:10px; padding:7px 18px; border-radius:99px; background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.22); font-family:"Anton",sans-serif; font-size:clamp(16px,2.6vw,30px); letter-spacing:3px; white-space:nowrap; }
+  #progreso{ margin-top:8px; font-size:clamp(12px,1.7vw,18px); font-weight:700; letter-spacing:.5px; opacity:.9; }
+  #reloj{ font-family:"Anton",sans-serif; font-variant-numeric:tabular-nums; line-height:.9; font-size:clamp(100px, min(18vw,31vh), 410px); margin:14px 0 4px; text-shadow:0 10px 40px rgba(0,0,0,.3); }
+  #barra-progreso{ width:min(86%,880px); height:9px; border-radius:99px; background:rgba(0,0,0,.22); overflow:hidden; margin-bottom:10px; }
+  #barra-progreso>div{ height:100%; width:100%; background:currentColor; border-radius:99px; opacity:.95; }
 
-  #preview {
-    margin-top: 26px; font-size: clamp(14px, 2.2vw, 26px);
-    opacity: .82; font-weight: 600;
-  }
-  #preview b { font-weight: 800; }
+  #columnas{ display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(14px,3vw,40px); width:100%; }
+  .col{ flex:1 1 300px; max-width:560px; display:flex; align-items:center; gap:13px; background:rgba(0,0,0,.14); border:1px solid rgba(255,255,255,.13); border-radius:18px; padding:11px 18px; }
+  .col .avatar{ width:50px; height:50px; border-radius:50%; flex:none; border:3px solid currentColor; object-fit:cover; }
+  .col.m .avatar{ border-color:var(--martin); }
+  .col.d .avatar{ border-color:var(--daniela); }
+  .col .avatar-2{ display:none; }
+  .col-txt{ text-align:left; min-width:0; }
+  .quien{ font-size:12px; font-weight:800; letter-spacing:2px; }
+  .col.m .quien{ color:#BAE6FD; }
+  .col.d .quien{ color:#FBCFE8; }
+  .ejercicio{ font-family:"Anton",sans-serif; font-size:clamp(23px,3.4vw,52px); line-height:1.02; word-break:break-word; }
+  /* warm-up = los dos */
+  body.vista-calor #columnas .col.d{ display:none; }
+  body.vista-calor #columnas .col.m{ max-width:780px; flex-basis:auto; }
+  body.vista-calor .col.m .quien{ color:rgba(0,0,0,.55); }
+  body.vista-calor .col.m .avatar{ border-color:#10131C; }
+  body.vista-calor .col.m .avatar-2{ display:block; margin-left:-16px; border-color:#10131C; }
 
-  #vacio { font-size: clamp(18px, 3vw, 34px); opacity: .85; max-width: 700px; line-height: 1.4; }
+  #fin-card{ display:none; align-items:center; gap:15px; background:rgba(0,0,0,.16); border:1px solid rgba(255,255,255,.2); border-radius:20px; padding:13px 22px; }
+  .avatar-emanuel{ width:58px; height:58px; border-radius:50%; border:3px solid #fff; flex:none; }
+  .fin-txt{ text-align:left; }
+  .fin-tit{ font-family:"Anton",sans-serif; font-size:clamp(24px,3.6vw,48px); }
+  .fin-sub{ opacity:.9; font-weight:600; font-size:14px; }
 
-  /* ---------- CONTROLES DE EJECUCIÓN ---------- */
-  #controles {
-    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-    z-index: 40; display: none; gap: 10px; align-items: center;
-    background: rgba(15,23,42,.75); backdrop-filter: blur(8px);
-    padding: 10px 14px; border-radius: 16px; border: 1px solid #1e293b;
-  }
-  #controles button { font-size: 18px; }
-  #btn-play { min-width: 120px; }
-  #ayuda-atajos { position: fixed; bottom: 6px; right: 10px; font-size: 11px; opacity: .35; z-index: 40; display: none; }
-  /* Los controles de ejecución sólo aparecen en la vista Ejecutar */
-  body.en-ejecucion #controles { display: flex; }
-  body.en-ejecucion #ayuda-atajos { display: block; }
-  body.controles-ocultos #controles, body.controles-ocultos #ayuda-atajos { display: none; }
+  #preview{ margin-top:16px; font-size:clamp(12px,1.5vw,17px); font-weight:600; opacity:.82; }
+  #preview b{ font-weight:800; }
+  #vacio{ max-width:560px; z-index:6; }
+  #vacio .icono{ font-size:60px; margin-bottom:8px; }
+  #vacio h3{ font-family:"Anton",sans-serif; font-size:clamp(28px,5vw,46px); letter-spacing:1px; }
+  #vacio p{ opacity:.82; font-size:17px; margin-top:10px; line-height:1.5; }
 
-  /* ---------- EDITOR / CATÁLOGO (scrollables) ---------- */
-  #p-editor, #p-catalogo {
-    flex-direction: column; align-items: stretch;
-    padding: 70px 20px 40px; overflow-y: auto; height: 100%; width: 100%;
-  }
-  .contenido { width: 100%; max-width: 1000px; margin: 0 auto; }
-  .contenido h2 { font-size: 24px; margin-bottom: 4px; }
-  .contenido .sub { opacity: .65; margin-bottom: 18px; font-size: 14px; }
+  /* ---------- DOCK ---------- */
+  #controles{ position:absolute; left:50%; transform:translateX(-50%); bottom:20px; z-index:40; display:none; gap:9px; align-items:center; width:min(560px,86vw); background:rgba(10,14,22,.6); backdrop-filter:blur(12px); padding:10px; border-radius:19px; border:1px solid rgba(255,255,255,.14); }
+  body.en-ejecucion #controles{ display:flex; }
+  #controles button{ flex:1; min-width:0; height:56px; display:flex; align-items:center; justify-content:center; gap:7px; border-radius:15px; background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.2); color:#fff; font-size:20px; font-weight:700; }
+  #controles button:hover{ background:rgba(255,255,255,.2); }
+  #btn-play{ flex:2.2; background:var(--accent); border:none; color:var(--ink); font-size:18px; letter-spacing:.5px; box-shadow:0 8px 22px rgba(242,165,22,.4); }
+  #btn-play:hover{ background:var(--accent); filter:brightness(1.05); }
+  #ayuda-atajos{ position:fixed; bottom:6px; right:12px; font-size:11px; opacity:.3; z-index:30; }
+  body:not(.en-ejecucion) #ayuda-atajos, body.foco #ayuda-atajos{ display:none; }
 
-  .fila-rutina { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  /* ---------- EDITOR / CATÁLOGO ---------- */
+  #p-editor, #p-catalogo{ overflow-y:auto; padding:28px 20px 110px; }
+  #p-editor.activa, #p-catalogo.activa{ display:block; }
+  .contenido{ width:100%; max-width:1000px; margin:0 auto; }
+  #p-catalogo .contenido{ max-width:760px; }
+  .contenido h2{ font-family:"Anton",sans-serif; font-size:clamp(26px,4vw,42px); letter-spacing:.5px; line-height:1.04; margin-bottom:6px; }
+  .contenido .sub{ color:var(--muted); margin-bottom:22px; font-size:14px; }
+  .guardado{ font-weight:800; color:#4ade80; opacity:0; transition:opacity .2s; margin-left:6px; }
+  .guardado.visible{ opacity:1; }
+  .fila-rutina{ display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; align-items:center; }
+  .fila-rutina label{ font-size:14px; color:var(--muted); }
+  .fila-rutina input[type=text]{ flex:1; min-width:200px; }
 
-  .set-card {
-    background: #1e293b; border: 1px solid #334155; border-radius: 14px;
-    padding: 16px; margin-bottom: 16px;
-  }
-  .set-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
-  .set-head .nom { font-size: 18px; font-weight: 800; margin-right: auto; }
-  .set-head label { font-size: 13px; opacity: .8; display: flex; align-items: center; gap: 6px; }
-  .set-head input[type=number] { width: 72px; }
+  .tiempos{ display:flex; gap:12px; flex-wrap:wrap; background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:18px; }
+  .tiempos label{ display:flex; flex-direction:column; gap:7px; flex:1; min-width:150px; font-size:13px; }
+  .tiempos label span{ font-weight:700; color:var(--muted); letter-spacing:.5px; font-size:12px; text-transform:uppercase; }
+  .tiempos input[type=number]{ width:100%; background:var(--ink); font-weight:700; font-size:16px; }
 
-  .tiempos {
-    display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
-    background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px;
-  }
-  .tiempos label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
-  .tiempos label span { opacity: .8; font-weight: 600; }
-  .tiempos input[type=number] { width: 110px; }
+  .set-card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:16px; }
+  .set-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .set-head .nom{ font-family:"Anton",sans-serif; font-size:20px; letter-spacing:1px; margin-right:auto; }
+  .ej-cols{ display:flex; gap:14px; flex-wrap:wrap; }
+  .ej-col{ flex:1; min-width:240px; background:var(--ink); border:1px solid var(--line); border-radius:12px; padding:12px; }
+  .ej-col-tit{ font-size:12px; font-weight:800; letter-spacing:1px; margin-bottom:10px; }
+  .col-martin .ej-col-tit{ color:var(--martin); }
+  .col-daniela .ej-col-tit{ color:var(--daniela); }
+  .ej-row{ display:flex; align-items:center; gap:6px; margin-bottom:7px; }
+  .ej-num{ width:18px; flex:none; text-align:center; color:#6B7892; font-weight:700; font-size:12px; }
+  .ej-row input[type=text]{ flex:1; min-width:0; background:var(--panel-2); }
+  .add-ej{ margin-top:4px; }
 
-  .ej-cols { display: flex; gap: 14px; }
-  .ej-col { flex: 1; min-width: 0; background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px; }
-  .ej-col-tit { font-size: 13px; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; }
-  .col-martin .ej-col-tit { color: #bae6fd; }
-  .col-daniela .ej-col-tit { color: #fbcfe8; }
-  .ej-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
-  .ej-num { width: 18px; flex: none; text-align: center; opacity: .5; font-weight: 700; font-size: 13px; }
-  .ej-row input[type=text] { flex: 1; min-width: 0; }
-  .ej-row .chico { padding: 6px 8px; font-size: 13px; }
-  .add-ej { margin-top: 4px; }
+  .calor-card{ background:#1a1407; border-color:#6b4e12; }
+  .calor-card .nom{ color:var(--accent); }
+  .calor-tiempos{ background:transparent; border:none; padding:0; margin-bottom:12px; }
+  .calor-tiempos input{ background:var(--ink); border-color:#6b4e12; }
+  .calor-tiempos label span{ color:#b89556; }
+  .calor-card .ej-col{ border-color:#6b4e12; }
+  .calor-card .ej-col input{ border-color:#6b4e12; }
+  .calor-tit{ color:var(--accent); }
 
-  .calor-card { border-color: #b45309; }
-  .calor-tiempos { background: #0f172a; margin-bottom: 10px; }
-  .calor-tit { color: #fbbf24; }
+  .catalogo-lista{ display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
+  .cat-row{ display:flex; gap:8px; align-items:center; }
+  .cat-row input{ flex:1; padding:12px 14px; border-radius:11px; }
+  .cat-row .peligro{ width:42px; height:42px; flex:none; border-radius:11px; }
+  .cat-add{ display:flex; gap:9px; margin-bottom:20px; }
+  .cat-add input{ flex:1; padding:13px 15px; border-radius:12px; }
+  .cat-add .primario{ padding:0 22px; border-radius:12px; white-space:nowrap; }
 
-  .catalogo-lista { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-  .cat-row { display: flex; gap: 8px; align-items: center; }
-  .cat-row input { flex: 1; }
-  .cat-add { display: flex; gap: 8px; }
-  .cat-add input { flex: 1; }
+  /* ===================== BOTTOM NAV (mobile) ===================== */
+  #bottom-nav{ display:none; flex:none; background:rgba(10,14,22,.9); backdrop-filter:blur(14px); border-top:1px solid rgba(255,255,255,.08); padding:7px 8px calc(7px + env(safe-area-inset-bottom)); z-index:60; }
+  #bottom-nav button{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; background:transparent; color:#7A87A1; padding:7px 4px; border-radius:12px; }
+  #bottom-nav button .ic{ font-size:19px; line-height:1; }
+  #bottom-nav button .lb{ font-size:11px; font-weight:700; letter-spacing:.3px; }
+  #bottom-nav button.activa{ color:var(--accent); }
 
-  .guardado { font-size: 13px; color: #4ade80; opacity: 0; transition: opacity .2s; }
-  .guardado.visible { opacity: 1; }
-
-  /* ===================== MODO MÓVIL (iPhone) ===================== */
-  body.modo-mobile #barra { flex-wrap: wrap; padding: 8px 10px; gap: 8px; }
-  body.modo-mobile .titulo-txt { display: none; }
-  body.modo-mobile .tabs { order: 3; width: 100%; }
-  body.modo-mobile .tabs button { flex: 1; padding: 10px 6px; }
-  body.modo-mobile #sel-rutina { flex: 1; min-width: 0; }
-  body.modo-mobile #p-ejecutar { padding: 118px 16px 150px; }
-  body.modo-mobile #p-editor, body.modo-mobile #p-catalogo { padding-top: 116px; }
-  body.modo-mobile #btn-full { display: none; }
-  body.modo-mobile #columnas { flex-direction: column; gap: 14px; }
-  body.modo-mobile .col { max-width: 100%; }
-  body.modo-mobile .col .ejercicio { font-size: clamp(30px, 9vw, 64px); }
-  body.modo-mobile #reloj { font-size: clamp(110px, 44vw, 320px); }
-  body.modo-mobile #ayuda-atajos { display: none !important; }
-  body.modo-mobile #controles {
-    left: 0; right: 0; bottom: 0; transform: none; width: 100%;
-    border-radius: 20px 20px 0 0; gap: 8px; align-items: center;
-    padding: 12px 12px calc(14px + env(safe-area-inset-bottom));
-  }
-  body.modo-mobile #controles button { flex: 1; font-size: 22px; padding: 18px 6px; min-width: 0; }
-  body.modo-mobile #btn-play { flex: 1.6; }
-  body.modo-mobile .ej-cols { flex-direction: column; gap: 12px; }
-  body.modo-mobile .ej-row input[type=text] { font-size: 16px; }
-  body.modo-mobile .ej-row .chico { padding: 10px; font-size: 15px; }
-  body.modo-mobile .tiempos { flex-direction: column; }
-  body.modo-mobile .tiempos label { flex: 1; }
-  body.modo-mobile .tiempos input[type=number] { width: 100%; }
-
-  @media (max-width: 640px) {
-    #columnas { flex-direction: column; gap: 16px; }
-    .ej-cols { flex-direction: column; gap: 12px; }
+  /* ===================== RESPONSIVE ===================== */
+  @media (max-width:760px){
+    .subbrand{ display:none; }
+    #barra .tabs{ display:none; }
+    .rutina-label{ display:none; }
+    #sel-rutina{ padding:10px 30px 10px 14px; max-width:150px; }
+    #btn-full{ display:none; }
+    #barra{ padding:9px 12px; gap:10px; }
+    #bottom-nav{ display:flex; }
+    #p-ejecutar{ padding:14px 14px 92px; }
+    #reloj{ font-size:clamp(90px, 35vw, 290px); }
+    #columnas{ flex-direction:column; }
+    .col{ flex-basis:auto; width:100%; max-width:100%; }
+    #controles{ width:calc(100% - 24px); bottom:14px; }
+    #ayuda-atajos{ display:none; }
+    .ej-cols{ flex-direction:column; }
   }
 </style>
 </head>
-<body class="estado-idle">
+<body class="estado-idle en-ejecucion">
 
-  <!-- ===================== BARRA SUPERIOR ===================== -->
-  <div id="barra">
-    <span class="titulo"><img src="icon.svg" alt="" class="logo-img"><span class="titulo-txt">GEMA</span></span>
-    <div class="tabs">
+  <!-- ===================== HEADER ===================== -->
+  <header id="barra">
+    <div class="brand">
+      <img src="assets/logo-gema.png" alt="GEMA" class="logo-img">
+      <div class="brand-txt">
+        <span class="wordmark">GEMA<span>FIT</span></span>
+        <span class="subbrand">TABATA · EN VIVO</span>
+      </div>
+    </div>
+    <nav class="tabs">
       <button data-vista="ejecutar" class="activa">▶ Ejecutar</button>
       <button data-vista="editor">✎ Editor</button>
       <button data-vista="catalogo">≡ Catálogo</button>
-    </div>
+    </nav>
     <span class="sep"></span>
-    <select id="sel-rutina" title="Rutina del día"></select>
-    <button id="btn-modo" title="Cambiar vista (mobile / escritorio)">💻</button>
-    <button id="btn-full" title="Pantalla completa">⛶</button>
-    <button id="btn-ocultar" title="Ocultar controles (tecla C)">Ocultar</button>
-  </div>
+    <div class="rutina-wrap">
+      <span class="rutina-label">RUTINA</span>
+      <select id="sel-rutina" title="Rutina del día"></select>
+    </div>
+    <button id="btn-foco" class="icon-btn" title="Modo foco (tecla C)">⊡</button>
+    <button id="btn-full" class="icon-btn" title="Pantalla completa">⛶</button>
+  </header>
 
-  <!-- ===================== PANTALLA: EJECUCIÓN ===================== -->
-  <div id="p-ejecutar" class="pantalla activa">
-    <div id="cont-activo" style="display:contents">
-      <div id="progreso">—</div>
-      <div id="estado">LISTO</div>
-      <div id="reloj">00</div>
-      <div id="barra-progreso"><div></div></div>
-      <div id="columnas">
-        <div class="col m">
-          <div class="quien">MARTIN <span class="flecha">→</span></div>
-          <div class="ejercicio" id="ej-martin">—</div>
+  <button id="salir-foco">✕ Salir de foco</button>
+
+  <!-- ===================== STAGE ===================== -->
+  <main id="stage">
+
+    <!-- EJECUTAR -->
+    <section id="p-ejecutar" class="pantalla activa">
+      <canvas id="confeti"></canvas>
+      <div id="cont-activo">
+        <div id="estado">LISTO</div>
+        <div id="progreso">—</div>
+        <div id="reloj">00</div>
+        <div id="barra-progreso"><div></div></div>
+        <div id="columnas">
+          <div class="col m">
+            <img class="avatar" src="assets/avatar-martin.png" alt="">
+            <img class="avatar avatar-2" src="assets/avatar-daniela.png" alt="">
+            <div class="col-txt">
+              <div class="quien">MARTÍN →</div>
+              <div class="ejercicio" id="ej-martin">—</div>
+            </div>
+          </div>
+          <div class="col d">
+            <img class="avatar" src="assets/avatar-daniela.png" alt="">
+            <div class="col-txt">
+              <div class="quien">DANIELA →</div>
+              <div class="ejercicio" id="ej-daniela">—</div>
+            </div>
+          </div>
         </div>
-        <div class="col d">
-          <div class="quien">DANIELA <span class="flecha">→</span></div>
-          <div class="ejercicio" id="ej-daniela">—</div>
+        <div id="fin-card">
+          <img src="assets/avatar-emanuel.png" class="avatar-emanuel" alt="">
+          <div class="fin-txt">
+            <div class="fin-tit">¡GRANDE, EQUIPO!</div>
+            <div class="fin-sub">Lo dieron todo. — Profe Emanuel</div>
+          </div>
         </div>
+        <div id="preview">Próximo: <b id="prev-txt">—</b></div>
       </div>
-      <div id="preview">Próximo: <b id="prev-txt">—</b></div>
-    </div>
-    <div id="vacio" style="display:none">
-      Esta rutina está vacía.<br>Andá al <b>Editor</b> para agregar sets y ejercicios.
-    </div>
-  </div>
-
-  <!-- Controles del profesor -->
-  <div id="controles">
-    <button id="btn-prev" title="Anterior (←)">⏮</button>
-    <button id="btn-play" class="primario" title="Play / Pausa (Espacio)">▶ Play</button>
-    <button id="btn-next" title="Siguiente (→)">⏭</button>
-    <button id="btn-reset" title="Reiniciar slot (R)">↺ Slot</button>
-  </div>
-  <div id="ayuda-atajos">Espacio=play/pausa · ←/→=anterior/siguiente · R=reiniciar slot · C=ocultar</div>
-
-  <!-- ===================== PANTALLA: EDITOR ===================== -->
-  <div id="p-editor" class="pantalla">
-    <div class="contenido">
-      <h2>Editor de rutinas</h2>
-      <div class="sub">Los cambios se guardan solos. <span class="guardado" id="guardado-ed">Guardado ✓</span></div>
-      <div class="fila-rutina">
-        <label style="font-size:14px;opacity:.8">Rutina:&nbsp;</label>
-        <select id="ed-sel-rutina"></select>
-        <input id="ed-nombre" type="text" placeholder="Nombre de la rutina" style="min-width:200px">
+      <div id="vacio" style="display:none">
+        <div class="icono">🗒️</div>
+        <h3>RUTINA VACÍA</h3>
+        <p>Andá al <b>Editor</b> para agregar sets y ejercicios, y armá la clase de hoy.</p>
       </div>
-      <div class="tiempos">
-        <label><span>Trabajo (s)</span><input type="number" min="0" id="ed-trabajo"></label>
-        <label><span>Descanso entre ejercicios (s)</span><input type="number" min="0" id="ed-descEj"></label>
-        <label><span>Descanso entre sets (s)</span><input type="number" min="0" id="ed-descSet"></label>
-      </div>
-      <div id="ed-calor"></div>
-      <div class="fila-rutina"><button id="ed-add-set" class="primario">+ Agregar set</button></div>
-      <div id="ed-sets"></div>
-    </div>
-  </div>
+    </section>
 
-  <!-- ===================== PANTALLA: CATÁLOGO ===================== -->
-  <div id="p-catalogo" class="pantalla">
-    <div class="contenido">
-      <h2>Catálogo de ejercicios</h2>
-      <div class="sub">Estos nombres aparecen como sugerencias al escribir en el editor. <span class="guardado" id="guardado-cat">Guardado ✓</span></div>
-      <div class="catalogo-lista" id="cat-lista"></div>
-      <div class="cat-add">
-        <input id="cat-nuevo" type="text" placeholder="Nuevo ejercicio (ej. Burpees)">
-        <button id="cat-add-btn" class="primario">+ Agregar</button>
+    <!-- EDITOR -->
+    <section id="p-editor" class="pantalla">
+      <div class="contenido">
+        <h2>EDITOR DE RUTINAS</h2>
+        <div class="sub">Los cambios se guardan solos en este dispositivo. <span class="guardado" id="guardado-ed">Guardado ✓</span></div>
+        <div class="fila-rutina">
+          <label>Rutina:</label>
+          <select id="ed-sel-rutina"></select>
+          <input id="ed-nombre" type="text" placeholder="Nombre de la rutina">
+        </div>
+        <div class="tiempos">
+          <label><span>Trabajo (s)</span><input type="number" min="0" id="ed-trabajo"></label>
+          <label><span>Descanso entre ejercicios (s)</span><input type="number" min="0" id="ed-descEj"></label>
+          <label><span>Descanso entre sets (s)</span><input type="number" min="0" id="ed-descSet"></label>
+        </div>
+        <div id="ed-calor"></div>
+        <div class="fila-rutina"><button id="ed-add-set" class="primario">+ Agregar set</button></div>
+        <div id="ed-sets"></div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- datalist compartido para autocompletar ejercicios -->
+    <!-- CATÁLOGO -->
+    <section id="p-catalogo" class="pantalla">
+      <div class="contenido">
+        <h2>CATÁLOGO</h2>
+        <div class="sub">Estos nombres aparecen como sugerencias al escribir en el editor. <span class="guardado" id="guardado-cat">Guardado ✓</span></div>
+        <div class="cat-add">
+          <input id="cat-nuevo" type="text" placeholder="Nuevo ejercicio (ej. Burpees)">
+          <button id="cat-add-btn" class="primario">+ Agregar</button>
+        </div>
+        <div class="catalogo-lista" id="cat-lista"></div>
+      </div>
+    </section>
+
+    <!-- DOCK -->
+    <div id="controles">
+      <button id="btn-prev" title="Anterior (←)">⏮</button>
+      <button id="btn-play" class="primario" title="Play / Pausa (Espacio)">▶ Play</button>
+      <button id="btn-next" title="Siguiente (→)">⏭</button>
+      <button id="btn-reset" title="Reiniciar ejercicio (R)">↺</button>
+    </div>
+    <div id="ayuda-atajos">Espacio = play/pausa · ←/→ = anterior/siguiente · R = reiniciar · C = foco</div>
+  </main>
+
+  <!-- ===================== BOTTOM NAV ===================== -->
+  <nav id="bottom-nav">
+    <button data-vista="ejecutar" class="activa"><span class="ic">▶</span><span class="lb">Ejecutar</span></button>
+    <button data-vista="editor"><span class="ic">✎</span><span class="lb">Editor</span></button>
+    <button data-vista="catalogo"><span class="ic">≡</span><span class="lb">Catálogo</span></button>
+  </nav>
+
   <datalist id="lista-ejercicios"></datalist>
 
 <script>
 "use strict";
 /* ============================================================
-   TABATA — App de cronómetro para clases por Meet
+   GEMA · TABATA — App de cronómetro para clases por Meet
    Un solo archivo, sin servidor. Persistencia en localStorage.
    ============================================================ */
 
@@ -343,9 +356,6 @@ const uid = () => "e" + Date.now().toString(36) + Math.random().toString(36).sli
 const clampInt = (v, min = 0) => Math.max(min, Math.floor(Number(v) || 0));
 
 /* ------------------ Datos por defecto (semilla) ------------------ */
-/* Modelo v2: cada rutina tiene tiempos únicos (trabajo, descansoEjercicio,
-   descansoSet) y cada set tiene dos listas de ejercicios: martin y daniela.
-   En la clase, el ejercicio i de Martin va en paralelo con el i de Daniela. */
 function mkSet(martin, daniela) { return { martin, daniela }; }
 function seedDefault() {
   const cat = [
@@ -357,7 +367,6 @@ function seedDefault() {
     "Estocadas suaves", "Sentadillas suaves"
   ].map((n) => ({ id: uid(), nombre: n }));
 
-  // Entrada en calor compartida de ejemplo (la misma para los dos)
   const calor = () => ({
     repeticiones: 2, trabajo: 20, descansoEjercicio: 10,
     ejercicios: ["Jumping jacks", "Rotación de hombros", "Rotación de cadera", "Marcha en el lugar", "Estocadas suaves", "Sentadillas suaves"]
@@ -411,8 +420,6 @@ function seedDefault() {
 const STORAGE_KEY = "tabata_v1";
 const PREF_KEY = "tabata_pref";
 
-/* Convierte datos del modelo viejo (v1: slots con trabajo/descanso por ejercicio)
-   al nuevo (v2: tiempos por rutina + listas martin/daniela por set). */
 function migrarV1aV2(d) {
   Object.values(d.rutinas || {}).forEach((r) => {
     if (!Array.isArray(r.sets)) r.sets = [];
@@ -460,18 +467,11 @@ function guardarPref() {
 
 /* ------------------ Estado global ------------------ */
 const APP = {
-  data: null,
-  rutinaKey: "lunes",
-  fases: [],          // rutina "aplanada" en fases secuenciales
-  idx: 0,
-  duracionMs: 0,
-  faseInicio: 0,      // performance.now() ajustado (para corregir deriva)
-  restanteMs: 0,
-  corriendo: false,
-  terminado: false,
-  ultBeepSeg: null,
-  vista: "ejecutar",
-  modo: "desktop",
+  data: null, rutinaKey: "lunes",
+  fases: [], idx: 0,
+  duracionMs: 0, faseInicio: 0, restanteMs: 0,
+  corriendo: false, terminado: false,
+  ultBeepSeg: null, vista: "ejecutar",
 };
 
 /* ------------------ Audio (Web Audio API) ------------------ */
@@ -488,26 +488,18 @@ function beep(freq, durMs, { type = "sine", vol = 0.35, when = 0 } = {}) {
   const t0 = audioCtx.currentTime + when;
   const osc = audioCtx.createOscillator();
   const g = audioCtx.createGain();
-  osc.type = type;
-  osc.frequency.value = freq;
+  osc.type = type; osc.frequency.value = freq;
   g.gain.setValueAtTime(0.0001, t0);
   g.gain.linearRampToValueAtTime(vol, t0 + 0.012);
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + durMs / 1000);
   osc.connect(g).connect(audioCtx.destination);
-  osc.start(t0);
-  osc.stop(t0 + durMs / 1000 + 0.03);
+  osc.start(t0); osc.stop(t0 + durMs / 1000 + 0.03);
 }
 function tonoInicio(fase) {
   if (!fase) return;
-  if (fase.tipo === "trabajo") {
-    // dos tonos ascendentes = ¡a trabajar!
-    beep(660, 120, { vol: 0.4 });
-    beep(990, 220, { vol: 0.4, when: 0.13 });
-  } else if (fase.tipo === "descansoSet") {
-    beep(330, 350, { type: "triangle", vol: 0.4 });
-  } else {
-    beep(440, 280, { type: "triangle", vol: 0.4 });
-  }
+  if (fase.tipo === "trabajo") { beep(660, 120, { vol: 0.4 }); beep(990, 220, { vol: 0.4, when: 0.13 }); }
+  else if (fase.tipo === "descansoSet") { beep(330, 350, { type: "triangle", vol: 0.4 }); }
+  else { beep(440, 280, { type: "triangle", vol: 0.4 }); }
 }
 function tonoFin() {
   beep(880, 160, { vol: 0.4 });
@@ -527,8 +519,6 @@ function construirFases(rutina) {
   const descEj = clampInt(rutina.descansoEjercicio);
   const descSet = clampInt(rutina.descansoSet);
 
-  // Entrada en calor (opcional): lista única compartida, repetida N veces,
-  // con sólo descanso entre ejercicios entre las vueltas (sin descanso de set).
   const ec = rutina.entradaCalor;
   const ejsCalor = ec ? (ec.ejercicios || []).map((x) => (x || "").trim()).filter((x) => x.length) : [];
   if (ejsCalor.length) {
@@ -545,11 +535,8 @@ function construirFases(rutina) {
         }
       }
     }
-    // breve transición hacia el entrenamiento (descanso de set), si hay workout
     const hayWorkout = (rutina.sets || []).some((s) => numEjerciciosSet(s) > 0);
-    if (hayWorkout && descSet > 0) {
-      fases.push({ tipo: "descansoSet", duracion: descSet, transicionCalor: true });
-    }
+    if (hayWorkout && descSet > 0) fases.push({ tipo: "descansoSet", duracion: descSet, transicionCalor: true });
   }
 
   sets.forEach((s, si) => {
@@ -557,9 +544,7 @@ function construirFases(rutina) {
     const n = numEjerciciosSet(s);
     for (let i = 0; i < n; i++) {
       const m = M[i] || "—", d = D[i] || "—";
-      if (trabajo > 0) {
-        fases.push({ tipo: "trabajo", duracion: trabajo, setIndex: si, slotIndex: i, martin: m, daniela: d });
-      }
+      if (trabajo > 0) fases.push({ tipo: "trabajo", duracion: trabajo, setIndex: si, slotIndex: i, martin: m, daniela: d });
       const ultimoEj = (i === n - 1);
       const ultimoSet = (si === sets.length - 1);
       if (!ultimoEj) {
@@ -577,20 +562,16 @@ function cargarRutina(key, { reset = true } = {}) {
   const rutina = APP.data.rutinas[key];
   APP.fases = construirFases(rutina);
   if (reset) {
-    APP.corriendo = false;
-    APP.terminado = false;
+    APP.corriendo = false; APP.terminado = false;
     if (APP.fases.length) entrarFase(0);
   }
   guardarPref();
   renderEjecucion();
 }
 
-/* Entra a la fase i, reseteada a tiempo completo.
-   NO cambia el estado corriendo/pausado; si está corriendo, suena el tono. */
 function entrarFase(i) {
   if (i < 0 || i >= APP.fases.length) return;
-  APP.idx = i;
-  APP.terminado = false;
+  APP.idx = i; APP.terminado = false;
   const f = APP.fases[i];
   APP.duracionMs = f.duracion * 1000;
   APP.restanteMs = APP.duracionMs;
@@ -601,27 +582,20 @@ function entrarFase(i) {
 }
 
 function terminar() {
-  APP.corriendo = false;
-  APP.terminado = true;
-  APP.restanteMs = 0;
+  APP.corriendo = false; APP.terminado = true; APP.restanteMs = 0;
   ensureAudio(); tonoFin();
   renderEjecucion();
+  lanzarConfeti();
 }
 
 function playPausa() {
   if (!APP.fases.length) return;
   ensureAudio();
-  if (APP.terminado) { // reiniciar todo desde el principio
-    APP.corriendo = false;
-    entrarFase(0);
-    return;
-  }
+  if (APP.terminado) { APP.corriendo = false; entrarFase(0); return; }
   if (APP.corriendo) {
-    // pausar: congelar restante
     APP.restanteMs = Math.max(0, APP.duracionMs - (performance.now() - APP.faseInicio));
     APP.corriendo = false;
   } else {
-    // reanudar/arrancar: recalcular inicio para conservar el restante
     const desdeInicio = APP.restanteMs >= APP.duracionMs;
     APP.faseInicio = performance.now() - (APP.duracionMs - APP.restanteMs);
     APP.corriendo = true;
@@ -640,7 +614,6 @@ function anterior() {
   if (APP.terminado) { entrarFase(APP.fases.length - 1); return; }
   entrarFase(Math.max(0, APP.idx - 1));
 }
-/* Reiniciar slot: volver a la fase de TRABAJO del slot actual */
 function reiniciarSlot() {
   if (!APP.fases.length) return;
   const actual = APP.fases[APP.idx] || APP.fases[APP.fases.length - 1];
@@ -658,7 +631,6 @@ function reiniciarSlot() {
   entrarFase(destino);
 }
 
-/* Bucle de animación con corrección de deriva (tiempo real por timestamps) */
 function loop() {
   if (APP.corriendo && !APP.terminado) {
     const rem = APP.duracionMs - (performance.now() - APP.faseInicio);
@@ -671,6 +643,7 @@ function loop() {
       pintarReloj(rem);
     }
   }
+  tickConfeti();
   requestAnimationFrame(loop);
 }
 function manejarBeeps(rem) {
@@ -679,6 +652,37 @@ function manejarBeeps(rem) {
     APP.ultBeepSeg = seg;
     beep(740, 110, { vol: 0.32 });
   }
+}
+
+/* ------------------ Confeti (celebración) ------------------ */
+let confeti = [];
+function lanzarConfeti() {
+  const cv = $("#confeti"); if (!cv) return;
+  const w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = w; cv.height = h;
+  const cols = ["#F2A516", "#38BDF8", "#F472B6", "#22C55E", "#FFFFFF", "#A78BFA"];
+  confeti = [];
+  for (let i = 0; i < 170; i++) confeti.push({
+    x: w / 2 + (Math.random() - .5) * w * 0.4, y: h * 0.32 + (Math.random() - .5) * 40,
+    vx: (Math.random() - .5) * 9, vy: -Math.random() * 13 - 4,
+    g: .28 + Math.random() * .12, s: 5 + Math.random() * 7,
+    rot: Math.random() * 6.28, vr: (Math.random() - .5) * .4,
+    col: cols[(Math.random() * cols.length) | 0], life: 1,
+  });
+}
+function tickConfeti() {
+  const cv = $("#confeti"); if (!cv || !confeti.length) return;
+  const ctx = cv.getContext("2d");
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  let alive = 0;
+  for (const p of confeti) {
+    if (p.life <= 0) continue;
+    p.vy += p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+    if (p.y > cv.height + 30) p.life = 0; else alive++;
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+    ctx.fillStyle = p.col; ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.6); ctx.restore();
+  }
+  if (!alive) { ctx.clearRect(0, 0, cv.width, cv.height); confeti = []; }
 }
 
 /* ------------------ Render de ejecución ------------------ */
@@ -699,58 +703,52 @@ function siguienteTrabajo(desde) {
   for (let k = desde + 1; k < APP.fases.length; k++) if (APP.fases[k].tipo === "trabajo") return k;
   return -1;
 }
-
 function pintarReloj(rem) {
   $("#reloj").textContent = fmt(rem);
   const frac = APP.duracionMs > 0 ? Math.max(0, rem) / APP.duracionMs : 0;
   $("#barra-progreso").firstElementChild.style.width = (frac * 100).toFixed(2) + "%";
 }
-
 function setEstadoBody(clase) {
-  document.body.classList.remove("estado-trabajo", "estado-descanso", "estado-descansoSet", "estado-terminado", "estado-idle");
+  document.body.classList.remove("estado-trabajo", "estado-descanso", "estado-descansoSet", "estado-calor", "estado-terminado", "estado-idle");
   document.body.classList.add(clase);
 }
-
 function renderControles() {
   $("#btn-play").innerHTML = APP.terminado ? "↺ Reiniciar" : (APP.corriendo ? "⏸ Pausa" : "▶ Play");
 }
-
 function renderEjecucion() {
   renderControles();
   const rutina = APP.data.rutinas[APP.rutinaKey];
   document.body.classList.remove("vista-calor");
-  const _quienM = $(".col.m .quien"); if (_quienM) _quienM.innerHTML = 'MARTIN <span class="flecha">→</span>';
+  $(".col.m .quien").textContent = "MARTÍN →";
+  $(".col.d .quien").textContent = "DANIELA →";
 
-  // Rutina vacía
+  const cols = $("#columnas"), prev = $("#preview"), finCard = $("#fin-card");
+
   if (!APP.fases.length) {
     $("#cont-activo").style.display = "none";
     $("#vacio").style.display = "block";
     setEstadoBody("estado-idle");
     return;
   }
-  $("#cont-activo").style.display = "contents";
+  $("#cont-activo").style.display = "flex";
   $("#vacio").style.display = "none";
 
-  // Estado terminado
   if (APP.terminado) {
     setEstadoBody("estado-terminado");
-    $("#progreso").textContent = rutina.nombre;
     $("#estado").textContent = "¡TERMINADO! 🎉";
+    $("#progreso").textContent = rutina.nombre;
     pintarReloj(0);
-    $("#ej-martin").textContent = "¡Bien hecho!";
-    $("#ej-daniela").textContent = "¡Bien hecho!";
-    $("#prev-txt").textContent = "—";
+    cols.style.display = "none"; prev.style.display = "none"; finCard.style.display = "flex";
     return;
   }
+  cols.style.display = "flex"; prev.style.display = "block"; finCard.style.display = "none";
 
   const f = APP.fases[APP.idx];
 
-  // Fondo + etiqueta de estado
-  if (f.tipo === "trabajo") { setEstadoBody("estado-trabajo"); $("#estado").textContent = f.calor ? "🔥 ENTRADA EN CALOR" : "TRABAJO"; }
+  if (f.tipo === "trabajo") { setEstadoBody(f.calor ? "estado-calor" : "estado-trabajo"); $("#estado").textContent = f.calor ? "🔥 ENTRADA EN CALOR" : "TRABAJO"; }
   else if (f.tipo === "descansoSet") { setEstadoBody("estado-descansoSet"); $("#estado").textContent = f.transicionCalor ? "¡A ENTRENAR!" : "DESCANSO ENTRE SETS"; }
   else { setEstadoBody("estado-descanso"); $("#estado").textContent = "DESCANSO"; }
 
-  // Progreso: Set X de N · Ejercicio J de M
   const totalSets = rutina.sets.length;
   if (f.transicionCalor) {
     $("#progreso").textContent = "Entrada en calor → ¡arranca el entrenamiento!";
@@ -763,18 +761,16 @@ function renderEjecucion() {
     $("#progreso").textContent = `Set ${f.setIndex + 1} de ${totalSets} · Ejercicio ${f.slotIndex + 1} de ${slotsEnSet}`;
   }
 
-  // Columnas: durante trabajo, el slot actual; durante descanso, el próximo slot (preparación)
   const idxTrab = indiceTrabajoMostrado(APP.idx);
   const ft = idxTrab >= 0 ? APP.fases[idxTrab] : null;
   if (ft && ft.calor) {
     document.body.classList.add("vista-calor");
-    if (_quienM) _quienM.innerHTML = 'LOS DOS <span class="flecha">→</span>';
+    $(".col.m .quien").textContent = "LOS DOS →";
   }
   const prefijo = (f.tipo === "trabajo") ? "" : "Prepará: ";
   $("#ej-martin").textContent = ft ? prefijo + ft.martin : "— Fin —";
   $("#ej-daniela").textContent = ft ? prefijo + ft.daniela : "— Fin —";
 
-  // Preview del siguiente trabajo después del mostrado
   const idxPrev = siguienteTrabajo(idxTrab >= 0 ? idxTrab : APP.idx);
   if (idxPrev >= 0) {
     const fp = APP.fases[idxPrev];
@@ -791,14 +787,12 @@ function cambiarVista(v) {
   APP.vista = v;
   $$(".pantalla").forEach((p) => p.classList.remove("activa"));
   $("#p-" + v).classList.add("activa");
-  $$("#barra .tabs button").forEach((b) => b.classList.toggle("activa", b.dataset.vista === v));
+  $$("#barra .tabs button, #bottom-nav button").forEach((b) => b.classList.toggle("activa", b.dataset.vista === v));
   document.body.classList.toggle("en-ejecucion", v === "ejecutar");
 
   if (v === "ejecutar") {
-    // al volver a ejecutar, reconstruyo desde los datos actuales (por si se editó)
     cargarRutina(APP.rutinaKey, { reset: true });
   } else {
-    // pausar el timer si me voy de la pantalla de ejecución
     if (APP.corriendo) { APP.restanteMs = Math.max(0, APP.duracionMs - (performance.now() - APP.faseInicio)); APP.corriendo = false; }
     if (v === "editor") renderEditor();
     if (v === "catalogo") renderCatalogo();
@@ -808,7 +802,7 @@ function cambiarVista(v) {
 /* ------------------ Selector de rutina ------------------ */
 function poblarSelectores() {
   const keys = Object.keys(APP.data.rutinas);
-  const opts = keys.map((k) => `<option value="${k}">${APP.data.rutinas[k].nombre}</option>`).join("");
+  const opts = keys.map((k) => `<option value="${k}">${escapeHtml(APP.data.rutinas[k].nombre)}</option>`).join("");
   $("#sel-rutina").innerHTML = opts;
   $("#ed-sel-rutina").innerHTML = opts;
   $("#sel-rutina").value = APP.rutinaKey;
@@ -862,7 +856,7 @@ function renderCalor() {
   const cont = $("#ed-calor");
   const ec = r.entradaCalor;
   if (!ec) {
-    cont.innerHTML = `<button class="chico" id="ec-agregar">🔥 + Agregar entrada en calor</button>`;
+    cont.innerHTML = `<div class="fila-rutina"><button class="chico" id="ec-agregar" style="background:rgba(242,165,22,.12);color:#F2A516;border:1px dashed #6b4e12;padding:12px 16px;border-radius:12px;">🔥 + Agregar entrada en calor</button></div>`;
     return;
   }
   const items = (ec.ejercicios || []).map((ej, i) => `
@@ -885,7 +879,7 @@ function renderCalor() {
         <label><span>Descanso entre ejercicios (s)</span><input type="number" min="0" data-campo="ec-descEj" value="${clampInt(ec.descansoEjercicio)}"></label>
       </div>
       <div class="ej-col">
-        <div class="ej-col-tit calor-tit">EJERCICIOS · los hacen los dos</div>
+        <div class="ej-col-tit calor-tit">EJERCICIOS · LOS HACEN LOS DOS</div>
         ${items}
         <button class="chico add-ej" data-accion="ec-add">+ Agregar ejercicio</button>
       </div>
@@ -893,7 +887,7 @@ function renderCalor() {
 }
 
 function colHTML(quien, lista, si) {
-  const titulo = quien === "martin" ? "MARTIN" : "DANIELA";
+  const titulo = quien === "martin" ? "MARTÍN" : "DANIELA";
   const items = (lista || []).map((ej, i) => `
     <div class="ej-row">
       <span class="ej-num">${i + 1}</span>
@@ -925,7 +919,6 @@ function setCardHTML(s, si) {
   </div>`;
 }
 
-// Cambios de valor en los ejercicios (sin re-render para no perder el foco)
 $("#ed-sets").addEventListener("input", (e) => {
   const t = e.target;
   if (t.dataset.campo !== "ej") return;
@@ -936,7 +929,6 @@ $("#ed-sets").addEventListener("input", (e) => {
   flashGuardado("guardado-ed");
 });
 
-// Acciones (botones) — re-render del editor
 $("#ed-sets").addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-accion]");
   if (!btn) return;
@@ -946,22 +938,16 @@ $("#ed-sets").addEventListener("click", (e) => {
   const quien = btn.dataset.quien;
   const idx = btn.dataset.idx !== undefined ? +btn.dataset.idx : -1;
 
-  if (acc === "add-ej") {
-    r.sets[si][quien].push("");
-  } else if (acc === "del-ej") {
-    r.sets[si][quien].splice(idx, 1);
-  } else if (acc === "up-ej") {
-    mover(r.sets[si][quien], idx, -1);
-  } else if (acc === "down-ej") {
-    mover(r.sets[si][quien], idx, +1);
-  } else if (acc === "del-set") {
+  if (acc === "add-ej") r.sets[si][quien].push("");
+  else if (acc === "del-ej") r.sets[si][quien].splice(idx, 1);
+  else if (acc === "up-ej") mover(r.sets[si][quien], idx, -1);
+  else if (acc === "down-ej") mover(r.sets[si][quien], idx, +1);
+  else if (acc === "del-set") {
     if (r.sets.length > 1) { if (!confirm("¿Borrar este set completo?")) return; r.sets.splice(si, 1); }
     else { alert("La rutina debe tener al menos un set."); return; }
-  } else if (acc === "up-set") {
-    mover(r.sets, si, -1);
-  } else if (acc === "down-set") {
-    mover(r.sets, si, +1);
-  }
+  } else if (acc === "up-set") mover(r.sets, si, -1);
+  else if (acc === "down-set") mover(r.sets, si, +1);
+
   guardarDatos();
   flashGuardado("guardado-ed");
   renderEditor();
@@ -994,7 +980,6 @@ bindTiempoRutina("ed-trabajo", "trabajo");
 bindTiempoRutina("ed-descEj", "descansoEjercicio");
 bindTiempoRutina("ed-descSet", "descansoSet");
 
-// ---- Entrada en calor ----
 $("#ed-calor").addEventListener("input", (e) => {
   const t = e.target, campo = t.dataset.campo;
   if (!campo) return;
@@ -1070,33 +1055,31 @@ $("#cat-add-btn").addEventListener("click", agregarEjercicio);
 $("#cat-nuevo").addEventListener("keydown", (e) => { if (e.key === "Enter") agregarEjercicio(); });
 
 /* ============================================================
-   CONTROLES Y ATAJOS
+   CONTROLES, NAVEGACIÓN Y ATAJOS
    ============================================================ */
 $("#btn-play").addEventListener("click", playPausa);
 $("#btn-next").addEventListener("click", siguiente);
 $("#btn-prev").addEventListener("click", anterior);
 $("#btn-reset").addEventListener("click", reiniciarSlot);
-$$("#barra .tabs button").forEach((b) => b.addEventListener("click", () => cambiarVista(b.dataset.vista)));
+$$("#barra .tabs button, #bottom-nav button").forEach((b) => b.addEventListener("click", () => cambiarVista(b.dataset.vista)));
 $("#sel-rutina").addEventListener("change", (e) => cargarRutina(e.target.value, { reset: true }));
 
 $("#btn-full").addEventListener("click", () => {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-  else document.exitFullscreen?.();
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+  else document.exitFullscreen && document.exitFullscreen();
 });
-function toggleControles() { document.body.classList.toggle("controles-ocultos"); }
-$("#btn-ocultar").addEventListener("click", toggleControles);
-$("#btn-modo").addEventListener("click", toggleModo);
+
+function toggleFoco() { document.body.classList.toggle("foco"); }
+$("#btn-foco").addEventListener("click", toggleFoco);
+$("#salir-foco").addEventListener("click", toggleFoco);
 
 document.addEventListener("keydown", (e) => {
-  // No interceptar mientras se escribe en inputs/selects (editor, catálogo)
   const tag = (e.target.tagName || "").toLowerCase();
   if (tag === "input" || tag === "textarea" || tag === "select") {
     if (e.key === "Escape") e.target.blur();
     return;
   }
-  // 'C' oculta/muestra controles en cualquier vista
-  if (e.key === "c" || e.key === "C") { e.preventDefault(); toggleControles(); return; }
-  // El resto de atajos sólo en la vista de ejecución
+  if (e.key === "c" || e.key === "C") { e.preventDefault(); toggleFoco(); return; }
   if (APP.vista !== "ejecutar") return;
   switch (e.key) {
     case " ": e.preventDefault(); playPausa(); break;
@@ -1107,38 +1090,15 @@ document.addEventListener("keydown", (e) => {
 });
 
 /* ============================================================
-   MODO DE DISPOSITIVO (mobile / escritorio)
-   ============================================================ */
-function detectarModo() {
-  const guardado = localStorage.getItem("tabata_modo");
-  if (guardado === "mobile" || guardado === "desktop") return guardado;
-  const tactil = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-  const angosto = window.matchMedia("(max-width: 820px)").matches;
-  return (tactil || angosto) ? "mobile" : "desktop";
-}
-function aplicarModo(m) {
-  APP.modo = m;
-  document.body.classList.toggle("modo-mobile", m === "mobile");
-  const btn = $("#btn-modo");
-  if (btn) btn.textContent = m === "mobile" ? "💻 Web" : "📱 App";
-}
-function toggleModo() {
-  const nuevo = APP.modo === "mobile" ? "desktop" : "mobile";
-  localStorage.setItem("tabata_modo", nuevo);
-  aplicarModo(nuevo);
-}
-
-/* ============================================================
    ARRANQUE
    ============================================================ */
 function init() {
   APP.data = cargarDatos();
-  guardarDatos(); // persistir la semilla nueva o los datos migrados a v2
+  guardarDatos();
   const pref = cargarPref();
   if (pref.rutina && APP.data.rutinas[pref.rutina]) APP.rutinaKey = pref.rutina;
   poblarSelectores();
   refrescarDatalist();
-  aplicarModo(detectarModo());
   document.body.classList.add("en-ejecucion");
   cargarRutina(APP.rutinaKey, { reset: true });
   requestAnimationFrame(loop);

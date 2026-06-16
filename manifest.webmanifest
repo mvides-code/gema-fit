@@ -1,16 +1,16 @@
 {
   "name": "GEMA · Tabata",
-  "short_name": "GEMA",
-  "description": "Cronómetro de Tabata del equipo GEMA.",
+  "short_name": "GEMA FIT",
+  "description": "Cronómetro de Tabata del equipo GEMA — clases de Martín y Daniela con el profe Emanuel.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "orientation": "any",
+  "background_color": "#0A0E16",
+  "theme_color": "#0A0E16",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
   ]
 }
