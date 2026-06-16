@@ -482,7 +482,6 @@ function ensureAudio() {
     if (AC) audioCtx = new AC();
   }
   if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
-  desbloquearVoz();
 }
 function beep(freq, durMs, { type = "sine", vol = 0.35, when = 0 } = {}) {
   if (!audioCtx) return;
@@ -499,38 +498,17 @@ function beep(freq, durMs, { type = "sine", vol = 0.35, when = 0 } = {}) {
 function tonoInicio(fase) {
   if (!fase) return;
   // Sonido de "0"/cambio de fase: trabajo = subida enérgica; descanso = bajada calma
-  if (fase.tipo === "trabajo") { beep(760, 110, { vol: 0.5 }); beep(1140, 340, { vol: 0.5, when: 0.11 }); }
-  else if (fase.tipo === "descansoSet") { beep(360, 420, { type: "triangle", vol: 0.45 }); }
-  else { beep(560, 150, { type: "triangle", vol: 0.45 }); beep(415, 320, { type: "triangle", vol: 0.45, when: 0.14 }); }
+  if (fase.tipo === "trabajo") { beep(760, 110, { vol: 0.9 }); beep(1140, 340, { vol: 0.9, when: 0.11 }); }
+  else if (fase.tipo === "descansoSet") { beep(360, 420, { type: "triangle", vol: 0.9 }); }
+  else { beep(560, 150, { type: "triangle", vol: 0.9 }); beep(415, 320, { type: "triangle", vol: 0.9, when: 0.14 }); }
 }
 function tonoFin() {
-  beep(880, 160, { vol: 0.4 });
-  beep(1175, 160, { vol: 0.4, when: 0.18 });
-  beep(1568, 380, { vol: 0.4, when: 0.36 });
+  beep(880, 160, { vol: 0.85 });
+  beep(1175, 160, { vol: 0.85, when: 0.18 });
+  beep(1568, 380, { vol: 0.85, when: 0.36 });
 }
-/* ---- Bip de cuenta regresiva (3-2-1) + voz "¡Aguantá!" ---- */
-function beepCuenta() { beep(950, 150, { vol: 0.6 }); }
-let _vozLista = false;
-function desbloquearVoz() {
-  try {
-    if (!window.speechSynthesis || _vozLista) return;
-    const u = new SpeechSynthesisUtterance(" ");
-    u.volume = 0; window.speechSynthesis.speak(u);
-    _vozLista = true;
-  } catch (e) {}
-}
-function decir(texto) {
-  try {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(texto);
-    u.lang = "es-AR"; u.rate = 1.05; u.pitch = 1; u.volume = 1;
-    const vs = window.speechSynthesis.getVoices() || [];
-    const es = vs.find((v) => /es[-_](AR|419|MX|US)/i.test(v.lang)) || vs.find((v) => /^es/i.test(v.lang));
-    if (es) u.voice = es;
-    window.speechSynthesis.speak(u);
-  } catch (e) {}
-}
+/* ---- Bip de cuenta regresiva (3-2-1) ---- */
+function beepCuenta() { beep(950, 150, { vol: 0.95 }); }
 
 /* ------------------ Motor del timer ------------------ */
 function numEjerciciosSet(s) {
@@ -675,8 +653,6 @@ function manejarBeeps(rem) {
   const seg = Math.ceil(rem / 1000);
   if (seg === APP.ultBeepSeg) return;
   APP.ultBeepSeg = seg;
-  const f = APP.fases[APP.idx];
-  if (seg === 5 && f && f.tipo === "trabajo") decir("¡Aguantá!"); // voz en el seg 5 (sólo trabajo)
   if (seg <= 3 && seg >= 1) beepCuenta();                          // BIP BIP BIP en 3-2-1
 }
 
